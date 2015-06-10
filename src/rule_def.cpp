@@ -1,5 +1,5 @@
 #include "sketch/rule_def.hpp"
-#include "sketch/context.hpp"
+#include "core/scope.hpp"
 #include "core/type.hpp"
 
 namespace gpse
@@ -8,6 +8,11 @@ namespace gpse
   {
     void setupLexer(lang::Lexer& lexer)
     {
+      lexer.scope()->layer().addElement("int", core::Symbol(core::Type::Integer));
+      lexer.scope()->layer().addElement("float", core::Symbol(core::Type::Floating));
+      lexer.scope()->layer().addElement("string", core::Symbol(core::Type::String));
+      lexer.scope()->layer().addElement("bool", core::Symbol(core::Type::Boolean));
+      
       lexer.rules().clear();
       
       lexer.wsRule() = [](int h) -> bool
@@ -158,18 +163,26 @@ namespace gpse
           keywords["false"] = K_FALSE;
           auto kw_it = keywords.find(temp);
           
-          core::Type type;
+          // if the identifier is a valid keyword
           if (kw_it != keywords.end())
           {
             return lang::Token(kw_it->second);
           }
-          else if (l->context().cast<Context*>()->typeScope().find(temp, &type))
+          // else, try to find out if it is a type name or a variable name
+          else
           {
-            return lang::Token(TYPENAME, type);
-          }
-          else if (l->context().cast<Context*>()->variableScope().find(temp))
-          {
-            return lang::Token(VARIABLENAME, temp);
+            core::Symbol sym;
+            if (l->scope()->layer().find(temp, &sym))
+            {
+              if (sym.isVariableName())
+              {
+                return lang::Token(VARIABLENAME, sym.variableName());
+              }
+              else if (sym.isType())
+              {
+                return lang::Token(TYPENAME, sym.type());
+              }
+            }
           }
           
           return lang::Token(IDENT, temp);

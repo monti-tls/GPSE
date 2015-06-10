@@ -1,14 +1,15 @@
 #include "sketch/grammar_def.hpp"
 #include "sketch/rule_def.hpp"
 #include "sketch/ast.hpp"
-#include "sketch/context.hpp"
+#include "core/symbol.hpp"
+#include "core/scope.hpp"
 
 namespace gpse
 {
   namespace sketch
   {
     void setupParser(lang::Parser& parser)
-    {
+    { 
       parser.grammars()["atom_term"] = lang::Grammar(
         [](lang::Parser* p) -> bool
         {
@@ -383,7 +384,7 @@ namespace gpse
             }
           }
           
-          p->context().cast<sketch::Context*>()->variableScope().addElement(name, type);
+          p->scope()->layer().addElement(name, core::Symbol(name));
           
           if (!p->eat(SEMICOLON, tok))
           {

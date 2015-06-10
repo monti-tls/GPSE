@@ -4,7 +4,7 @@
 #include "sketch/grammar_def.hpp"
 #include "sketch/ast.hpp"
 #include "sketch/pass_def.hpp"
-#include "sketch/context.hpp"
+#include "core/scope.hpp"
 
 #include <iostream>
 #include <string>
@@ -17,7 +17,7 @@ int main()
 {
   std::string str =
   "int foo = true || false;"//-5*20+0;\n"
-  "foo = 1/(4/3+1/3)*foo;\n"
+  "foo = 1.0/(4.0/3.0+1.0/3.0)*foo;\n"
   "foo = 0+foo;\n"
   "foo = foo+0*45;\n"
   "foo = 0-foo;\n"
@@ -30,8 +30,8 @@ int main()
   
   std::istringstream ss(str);
   
-  sketch::Context* ctx = new sketch::Context();
-  lang::Lexer lexer(ss, ctx);
+  core::Scope* scope = new core::Scope();
+  lang::Lexer lexer(ss, scope);
   sketch::setupLexer(lexer);
   
   lang::Parser parser(lexer);
@@ -53,7 +53,7 @@ int main()
   print.pass(root);
   
   delete root;
-  delete ctx;
+  delete scope;
   
   return 0;
 }

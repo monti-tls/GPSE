@@ -1,84 +1,48 @@
 #ifndef __GPSE_CORE_SCOPE_H__
 #define __GPSE_CORE_SCOPE_H__
 
+#include "core/symbol.hpp"
+
 #include <vector>
-#include <algorithm>
+#include <map>
 
 namespace gpse
 {
   namespace core
   {
-    template <typename T>
+    class ScopeLayer
+    {
+    public:
+      ScopeLayer(ScopeLayer* parent = nullptr, ScopeLayer* child = nullptr);
+      ~ScopeLayer();
+      
+      void setParent(ScopeLayer* parent);
+      ScopeLayer* parent() const;
+      void setChild(ScopeLayer* child);
+      ScopeLayer* child() const;
+      
+      void addElement(std::string const& name, Symbol const& element);
+      bool find(std::string const& name, Symbol* element = nullptr);
+      
+    private:
+      ScopeLayer* _m_parent;
+      ScopeLayer* _m_child;
+      std::map<std::string, Symbol> _m_content;
+    };
+    
     class Scope
     {
     public:
-      Scope(Scope<T>* parent = nullptr, Scope<T>* child = nullptr) :
-        _m_parent(parent),
-        _m_child(child)
-      {}
+      Scope();
+      ~Scope();
       
-      ~Scope()
-      {
-        delete _m_child;
-      }
-      
-      Scope<T>* parent() const
-      {
-        return _m_parent;
-      }
-      
-      void setParent(Scope<T>* parent)
-      {
-        _m_parent = parent;
-      }
-      
-      Scope<T>* child() const
-      {
-        return _m_child;
-      }
-      
-      void setChild(Scope<T>* child)
-      {
-        _m_child = child;
-      }
-      
-      void addElement(T const& element)
-      {
-        _m_content.push_back(element);
-      }
-      
-      bool scopedFind(T const& element)
-      {
-        auto it = std::find(_m_content.begin(), _m_content.end(), element);
-        if (it == _m_content.end())
-        {
-          return false;
-        }
-        
-        return true;
-      }
-      
-      bool find(T const& element)
-      {
-        auto it = _m_content.find(element);
-        if (it == _m_content.end())
-        {
-          if (_m_parent)
-          {
-            return _m_parent->find(element);
-          }
-          
-          return false;
-        }
-        
-        return true;
-      }
+      ScopeLayer& layer();
+      ScopeLayer const& layer() const;
+      ScopeLayer& down();
+      ScopeLayer& up();
       
     private:
-      Scope<T>* _m_parent;
-      Scope<T>* _m_child;
-      std::vector<Scope*> _m_children;
-      std::vector<T> _m_content;
+      ScopeLayer* _m_currentLayer;
     };
   }
 }

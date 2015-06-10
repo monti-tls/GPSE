@@ -27,14 +27,9 @@ std::map<std::string, Grammar> const& Parser::grammars() const
   return _m_grammars;
 }
 
-core::Some& Parser::context()
+core::Scope* Parser::scope() const
 {
-  return _m_lexer.context();
-}
-
-core::Some const& Parser::context() const
-{
-  return _m_lexer.context();
+  return _m_lexer.scope();
 }
 
 bool Parser::good() const

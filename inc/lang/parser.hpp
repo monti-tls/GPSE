@@ -4,6 +4,7 @@
 #include "lang/lexer.hpp"
 #include "lang/node.hpp"
 #include "lang/grammar.hpp"
+#include "core/scope.hpp"
 
 #include <map>
 
@@ -19,8 +20,7 @@ namespace gpse
       
       std::map<std::string, Grammar>& grammars();
       std::map<std::string, Grammar> const& grammars() const;
-      core::Some& context();
-      core::Some const& context() const;
+      core::Scope* scope() const;
       
       bool good() const;
       void reset();

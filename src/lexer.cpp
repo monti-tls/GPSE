@@ -3,9 +3,9 @@
 using namespace gpse;
 using namespace lang;
 
-Lexer::Lexer(std::istream& in, core::Some const& context) :
+Lexer::Lexer(std::istream& in, core::Scope* scope) :
   _m_in(in),
-  _m_context(context),
+  _m_scope(scope),
   _m_line(1),
   _m_col(1),
   _m_pos(_m_in.tellg()),
@@ -39,14 +39,9 @@ std::vector<Rule> const& Lexer::rules() const
   return _m_rules;
 }
 
-core::Some& Lexer::context()
+core::Scope* Lexer::scope() const
 {
-  return _m_context;
-}
-
-core::Some const& Lexer::context() const
-{
-  return _m_context;
+  return _m_scope;
 }
 
 bool Lexer::good() const
