@@ -7,8 +7,6 @@ namespace gpse
 {
   namespace lang
   {
-    class NodeVisitor;
-    
     class Node
     {
     public:
@@ -24,8 +22,6 @@ namespace gpse
       std::vector<Node*>& children();
       std::vector<Node*> const& children() const;
       void substituteChild(Node* oldChild, Node* newChild);
-      
-      virtual void accept(NodeVisitor* visitor);
       
     private:
       int _m_which;

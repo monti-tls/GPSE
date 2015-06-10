@@ -15,7 +15,6 @@
 		FA432E511B28A06D00214364 /* literal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA432E341B28A00300214364 /* literal.cpp */; };
 		FA432E521B28A06D00214364 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA432E351B28A00300214364 /* main.cpp */; };
 		FA432E531B28A06D00214364 /* node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA432E361B28A00300214364 /* node.cpp */; };
-		FA432E541B28A06D00214364 /* nodevisisor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA432E371B28A00300214364 /* nodevisisor.cpp */; };
 		FA432E551B28A06D00214364 /* parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA432E381B28A00300214364 /* parser.cpp */; };
 		FA432E561B28A06D00214364 /* pass_def.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA432E391B28A00300214364 /* pass_def.cpp */; };
 		FA432E571B28A06D00214364 /* rule.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA432E3A1B28A00300214364 /* rule.cpp */; };
@@ -46,7 +45,6 @@
 		FA432E1F1B28A00300214364 /* grammar.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = grammar.hpp; sourceTree = "<group>"; };
 		FA432E201B28A00300214364 /* lexer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = lexer.hpp; sourceTree = "<group>"; };
 		FA432E211B28A00300214364 /* node.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = node.hpp; sourceTree = "<group>"; };
-		FA432E221B28A00300214364 /* nodevisitor.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = nodevisitor.hpp; sourceTree = "<group>"; };
 		FA432E231B28A00300214364 /* parser.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = parser.hpp; sourceTree = "<group>"; };
 		FA432E241B28A00300214364 /* rule.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = rule.hpp; sourceTree = "<group>"; };
 		FA432E251B28A00300214364 /* token.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = token.hpp; sourceTree = "<group>"; };
@@ -64,7 +62,6 @@
 		FA432E341B28A00300214364 /* literal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = literal.cpp; sourceTree = "<group>"; };
 		FA432E351B28A00300214364 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		FA432E361B28A00300214364 /* node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = node.cpp; sourceTree = "<group>"; };
-		FA432E371B28A00300214364 /* nodevisisor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = nodevisisor.cpp; sourceTree = "<group>"; };
 		FA432E381B28A00300214364 /* parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = parser.cpp; sourceTree = "<group>"; };
 		FA432E391B28A00300214364 /* pass_def.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pass_def.cpp; sourceTree = "<group>"; };
 		FA432E3A1B28A00300214364 /* rule.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rule.cpp; sourceTree = "<group>"; };
@@ -125,7 +122,6 @@
 				FA432E1F1B28A00300214364 /* grammar.hpp */,
 				FA432E201B28A00300214364 /* lexer.hpp */,
 				FA432E211B28A00300214364 /* node.hpp */,
-				FA432E221B28A00300214364 /* nodevisitor.hpp */,
 				FA432E231B28A00300214364 /* parser.hpp */,
 				FA432E241B28A00300214364 /* rule.hpp */,
 				FA432E251B28A00300214364 /* token.hpp */,
@@ -157,7 +153,6 @@
 				FA432E341B28A00300214364 /* literal.cpp */,
 				FA432E351B28A00300214364 /* main.cpp */,
 				FA432E361B28A00300214364 /* node.cpp */,
-				FA432E371B28A00300214364 /* nodevisisor.cpp */,
 				FA432E381B28A00300214364 /* parser.cpp */,
 				FA432E391B28A00300214364 /* pass_def.cpp */,
 				FA432E3A1B28A00300214364 /* rule.cpp */,
@@ -253,7 +248,6 @@
 				FA432E511B28A06D00214364 /* literal.cpp in Sources */,
 				FA432E521B28A06D00214364 /* main.cpp in Sources */,
 				FA432E531B28A06D00214364 /* node.cpp in Sources */,
-				FA432E541B28A06D00214364 /* nodevisisor.cpp in Sources */,
 				FA432E551B28A06D00214364 /* parser.cpp in Sources */,
 				FA432E561B28A06D00214364 /* pass_def.cpp in Sources */,
 				FA432E571B28A06D00214364 /* rule.cpp in Sources */,

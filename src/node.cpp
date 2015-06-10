@@ -1,5 +1,4 @@
 #include "lang/node.hpp"
-#include "lang/nodevisitor.hpp"
 
 #include <algorithm>
 
@@ -77,9 +76,4 @@ void Node::substituteChild(Node* oldChild, Node* newChild)
     newChild->setParent(this);
     *it = newChild;
   }
-}
-
-void Node::accept(NodeVisitor* visitor)
-{
-  visitor->visit(this);
 }
