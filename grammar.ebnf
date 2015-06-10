@@ -1,0 +1,74 @@
+LPAR   = '('
+       ;
+RPAR   = ')'
+       ;
+TIMES  = '*'
+       ;
+SLASH  = '/'
+       ;
+PLUS   = '+'
+       ;
+MINUS  = '-'
+       ;
+AND    = '&&'
+       ;
+OR     = '||'
+       ;
+NOT    = '!'
+       ;
+LT     = '<'
+       ;
+LTE    = '<='
+       ;
+GT     = '>'
+       ;
+GTE    = '>='
+       ;
+EQ     = '=='
+       ;
+NEQ    = '!='
+       ;
+NUMBER = ('0'..'9')+ ('.' ('0'..'9')+)?
+       ;
+IDENT  = (('a'..'Z') | '_')+ ((('a'..'Z') | ('0'-'9') | '_')+)?
+       ;
+TYPENAME = "int"
+         | "float"
+         | "string"
+         | "bool"
+         ;
+
+Atom       = NUMBER
+           | LPAR Expression RPAR
+           | IDENT ArgList?
+           ;
+
+TermNot    = NOT* Atom
+           ;
+           
+TermUnary  = MINUS* TermNot
+	   ;
+	   
+TermMul    = TermUnary
+             ((TIMES | SLASH) TermUnary)*
+           ;
+           
+TermAdd    = TermMul
+             ((PLUS | MINUS) TermMul)*
+           ;
+           
+TermRel    = TermAdd
+             ((LT | LTE | GT | GTE | EQ | NEQ) TermAdd)*
+	   ;
+	   
+Expression = TermRel
+             ((AND | OR) TermRel)*
+	   ;
+	   
+VarDecl    = TYPENAME IDENT
+             ( EQUALS Expression))?
+             SEMICOLON
+             ;
+            
+VarAssign  = IDENT EQUALS Expression SEMICOLON
+           ;
