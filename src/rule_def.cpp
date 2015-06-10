@@ -153,16 +153,17 @@ namespace gpse
             temp += l->get();
           }
           
+          std::map<std::string, int> keywords;
+          keywords["true"] = K_TRUE;
+          keywords["false"] = K_FALSE;
+          auto kw_it = keywords.find(temp);
+          
           core::Type type;
-          if (temp == "true")
+          if (kw_it != keywords.end())
           {
-            return lang::Token(K_TRUE);
+            return lang::Token(kw_it->second);
           }
-          else if (temp == "false")
-          {
-            return lang::Token(K_FALSE);
-          }
-          if (l->context().cast<Context*>()->typeScope().find(temp, &type))
+          else if (l->context().cast<Context*>()->typeScope().find(temp, &type))
           {
             return lang::Token(TYPENAME, type);
           }

@@ -27,7 +27,7 @@ namespace gpse
           }
           else if (val.isBoolean())
           {
-            std::cout << "(bool) " << val.boolean();
+            std::cout << "(bool) " << (val.boolean() ? "true" : "false");
           }
           else if (val.isInteger())
           {
@@ -332,11 +332,12 @@ namespace gpse
               node = reduced;
             }
             // Simplify some Literal <-> Non-literal expressions
-            // 1 * Non-literal
-            // 0 + Non-literal
+            // 1 * Non-literal -> Non-literal
+            // 0 + Non-literal -> Non-literal
+            // 0 - Non-literal -> - Non-literal
             else if (lhsNode->which() == LITERAL_NODE)
             {
-              // don't work with reference to expression->children() elements
+              // don't work with lhsNode / rhsNode references to expression->children() elements
               // as we may remove some elements off this vector
               lang::Node* lhs = lhsNode;
               lang::Node* rhs = rhsNode;
@@ -374,13 +375,13 @@ namespace gpse
               }
             }
             // Simplify some Non-literal <-> Literal expressions
-            // Non-literal * 1
-            // Non-literal / 1
-            // Non-literal + 0
-            // Non-literal - 0
+            // Non-literal * 1 -> Non-literal
+            // Non-literal / 1 -> Non-literal
+            // Non-literal + 0 -> Non-literal
+            // Non-literal - 0 -> Non-literal
             else if (rhsNode->which() == LITERAL_NODE)
             {
-              // don't work with reference to expression->children() elements
+              // don't work with lhsNode / rhsNode references to expression->children() elements
               // as we may remove some elements off this vector
               lang::Node* lhs = lhsNode;
               lang::Node* rhs = rhsNode;
