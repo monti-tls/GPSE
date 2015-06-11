@@ -19,7 +19,7 @@ int main()
   "int function(int n)\n"
   "{\n"
   "  int fee = (int) 1.0/2.0 + 3.0/4.0 + 5.0/6.0;\n"
-  "  int foo = fee*function(n-1);\n"
+  "  return fee*function(n-1);\n"
   "}\n"
   ;
   

@@ -1,6 +1,9 @@
 #include "sketch/pass_def.hpp"
 #include "sketch/ast.hpp"
 #include "lang/parser.hpp"
+#include "core/symbol.hpp"
+#include "core/type.hpp"
+#include "core/function.hpp"
 
 #include <iostream>
 
@@ -229,6 +232,37 @@ namespace gpse
           }
           
           std::cout << "}" << std::endl;
+        }
+      );
+      
+      
+      
+      pass.addOperator<RETURN_STATEMENT_NODE, ReturnStatementNode>(
+        [](lang::TreePass* pass, lang::Node*& node, ReturnStatementNode* stat)
+        {
+          for (int i = 0; i < indent; ++i)
+          {
+            std::cout << "  ";
+          }
+         
+          std::cout << "{return statement";
+         
+          if (stat->children().size())
+          {
+            std::cout << ": ";
+            ++indent;
+            pass->pass(stat->children()[0]);
+            --indent;
+            for (int i = 0; i < indent; ++i)
+            {
+              std::cout << "  ";
+            }
+            std::cout << "}" << std::endl;
+          }
+          else
+          {
+            std::cout << "}" << std::endl;
+          }
         }
       );
       
@@ -639,6 +673,27 @@ namespace gpse
            assign->error("invalid implicit type conversion");
          }
        }
+      );
+      
+      typeCheck.addOperator<RETURN_STATEMENT_NODE, ReturnStatementNode>(
+        [](lang::TreePass* pass, lang::Node*& node, ReturnStatementNode* stat)
+        {
+          core::Symbol self;
+          node->scope()->layer().findInScope("self", &self);
+          core::Type ltp = self.function().prototype().ret();
+          
+          core::Type rtp = core::Type::Nil;
+          if (stat->children().size())
+          {
+            pass->pass(stat->children()[0]);
+            rtp = pass->storage().cast<core::Type>();
+          }
+          
+          if (ltp != rtp)
+          {
+            stat->error("invalid implicit type conversion");
+          }
+        }
       );
       
       return typeCheck;

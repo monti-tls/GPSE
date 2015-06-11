@@ -20,6 +20,7 @@ namespace gpse
       CAST_NODE,
       VARIABLE_DECL_NODE,
       VARIABLE_ASSIGN_NODE,
+      RETURN_STATEMENT_NODE,
       STATEMENT_BLOCK_NODE,
       FUNCTION_DECLARATION_NODE
     };
@@ -116,7 +117,7 @@ namespace gpse
     class VariableDeclNode : public lang::Node
     {
     public:
-      VariableDeclNode(core::Variable const& variable, ExpressionNode* initialization = nullptr, lang::Node* parent = nullptr);
+      VariableDeclNode(core::Variable const& variable, lang::Node* initialization = nullptr, lang::Node* parent = nullptr);
       ~VariableDeclNode();
       
       core::Variable const& variable() const;
@@ -128,13 +129,20 @@ namespace gpse
     class VariableAssignNode : public lang::Node
     {
     public:
-      VariableAssignNode(core::Variable const& variable, ExpressionNode* value, lang::Node* parent = nullptr);
+      VariableAssignNode(core::Variable const& variable, lang::Node* value, lang::Node* parent = nullptr);
       ~VariableAssignNode();
       
       core::Variable const& variable() const;
       
     private:
       core::Variable _m_variable;
+    };
+    
+    class ReturnStatementNode : public lang::Node
+    {
+    public:
+      ReturnStatementNode(lang::Node* value = nullptr, lang::Node* parent = nullptr);
+      ~ReturnStatementNode();
     };
     
     class StatementBlockNode : public lang::Node

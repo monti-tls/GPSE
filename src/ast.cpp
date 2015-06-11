@@ -113,7 +113,7 @@ ExpressionNode::Binary ExpressionNode::binaryOperation() const
   return _m_binary;
 }
 
-VariableDeclNode::VariableDeclNode(core::Variable const& variable, ExpressionNode* value, lang::Node* parent) :
+VariableDeclNode::VariableDeclNode(core::Variable const& variable, lang::Node* value, lang::Node* parent) :
   lang::Node(VARIABLE_DECL_NODE, parent),
   _m_variable(variable)
 {
@@ -133,7 +133,7 @@ core::Variable const& VariableDeclNode::variable() const
   return _m_variable;
 }
 
-VariableAssignNode::VariableAssignNode(core::Variable const& variable, ExpressionNode* value, lang::Node* parent) :
+VariableAssignNode::VariableAssignNode(core::Variable const& variable, lang::Node* value, lang::Node* parent) :
   lang::Node(VARIABLE_ASSIGN_NODE, parent),
   _m_variable(variable)
 {
@@ -148,6 +148,20 @@ VariableAssignNode::~VariableAssignNode()
 core::Variable const& VariableAssignNode::variable() const
 {
   return _m_variable;
+}
+
+ReturnStatementNode::ReturnStatementNode(lang::Node* value, lang::Node* parent) :
+  lang::Node(RETURN_STATEMENT_NODE, parent)
+{
+  if (value)
+  {
+    addChild(value);
+  }
+}
+
+ReturnStatementNode::~ReturnStatementNode()
+{
+  
 }
 
 StatementBlockNode::StatementBlockNode(lang::Node* parent) :

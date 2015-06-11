@@ -39,7 +39,8 @@ namespace gpse
       VARIABLENAME,
       FUNCTIONNAME,
       K_TRUE,
-      K_FALSE
+      K_FALSE,
+      K_RETURN
     };
     
     void setupLexer(lang::Lexer& lexer);

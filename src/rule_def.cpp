@@ -164,6 +164,7 @@ namespace gpse
           std::map<std::string, int> keywords;
           keywords["true"] = K_TRUE;
           keywords["false"] = K_FALSE;
+          keywords["return"] = K_RETURN;
           auto kw_it = keywords.find(temp);
           
           // if the identifier is a valid keyword

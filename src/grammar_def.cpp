@@ -544,7 +544,8 @@ namespace gpse
         [](lang::Parser* p) -> bool
         {
           return p->predicate("variable_declaration") ||
-                 p->predicate("variable_assign");
+                 p->predicate("variable_assign") ||
+                 p->predicate("return_statement");
         },
         
         [](lang::Parser* p) -> lang::Node*
@@ -553,9 +554,13 @@ namespace gpse
           {
             return p->parse("variable_assign");
           }
-          else // if (p->predicate("variable_declaration"))
+          else if (p->predicate("variable_declaration"))
           {
             return p->parse("variable_declaration");
+          }
+          else // if (p->predicate("return_statement"))
+          {
+            return p->parse("return_statement");
           }
         }
       );
@@ -583,6 +588,51 @@ namespace gpse
           } while (p->predicate("statement"));
           
           return block;
+        }
+      );
+      
+      parser.grammars()["return_statement"] = lang::Grammar(
+        [](lang::Parser* p) -> bool
+        {
+          return p->seek().which == K_RETURN;
+        },
+
+        [](lang::Parser* p) -> lang::Node*
+        {
+          lang::Token tok;
+          if (!p->eat(K_RETURN, tok))
+          {
+            return nullptr;
+          }
+          lang::Token ptok = tok;
+          lang::Node* expr = nullptr;
+          
+          core::Symbol self;
+          bool isSelf = p->scope()->layer().find("self", &self);
+          if (!isSelf || !self.isFunction())
+          {
+            p->error("return statement not in function");
+          }
+          
+          if (p->seek().which != SEMICOLON)
+          {
+            p->parse("expression");
+            if (!expr)
+            {
+              return nullptr;
+            }
+          }
+          
+          if (!p->eat(SEMICOLON, tok))
+          {
+            p->error("expected `;'");
+            delete expr;
+            return nullptr;
+          }
+          
+          ReturnStatementNode* node = new ReturnStatementNode(expr);
+          node->setToken(ptok);
+          return node;
         }
       );
       
@@ -678,6 +728,9 @@ namespace gpse
          p->scope()->layer().parent()->addElement(name, function);
          FunctionDeclarationNode* node = new FunctionDeclarationNode(function);
          node->setToken(ptok);
+         
+         
+         p->scope()->down().addElement("self", function);
          
          if (!p->eat(LCURLY, tok))
          {

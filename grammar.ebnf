@@ -82,6 +82,9 @@ VarDecl    = TYPENAME IDENT
 VarAssign  = VARIABLENAME EQUALS Expression SEMICOLON
            ;
            
+ReturnStatement = RETURN Expression? SEMICOLON
+                ;
+
 Statement = VarDecl
           | VarAssign
           ;
