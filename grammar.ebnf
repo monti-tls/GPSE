@@ -28,6 +28,12 @@ EQ     = '=='
        ;
 NEQ    = '!='
        ;
+COMMA  = ','
+       ;
+LCURLY = '{'
+       ;
+RCURLY = '}'
+       ;
 NUMBER = ('0'..'9')+ ('.' ('0'..'9')+)?
        ;
 IDENT  = (('a'..'Z') | '_')+ ((('a'..'Z') | ('0'-'9') | '_')+)?
@@ -37,10 +43,13 @@ TYPENAME = "int"
          | "string"
          | "bool"
          ;
+VARIABLENAME = IDENT (with predicate);
+FUNCTIONNAME = IDENT (with predicate);
 
 Atom       = NUMBER
            | LPAR Expression RPAR
-           | IDENT ArgList?
+           | VARIABLENAME
+           | FUNCTIONNAME LPAR (Expression (COMMA Expression)*))? RPAR
            ;
 
 TermNot    = NOT* Atom
@@ -70,5 +79,16 @@ VarDecl    = TYPENAME IDENT
              SEMICOLON
              ;
             
-VarAssign  = IDENT EQUALS Expression SEMICOLON
+VarAssign  = VARIABLENAME EQUALS Expression SEMICOLON
            ;
+           
+Statement = VarDecl
+          | VarAssign
+          ;
+
+StatementBlock = Statement+
+               ;
+
+FunctionDeclaration = TYPENAME IDENT LPAR (TYPENAME IDENT (COMMA TYPENAME IDENT)*)? RPAR
+                      LCURLY StatementBlock RCURLY
+                    ;

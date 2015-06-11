@@ -40,9 +40,10 @@ int main()
   lang::TreePass litred = sketch::getLiteralReductionPass();
   lang::TreePass typecheck = sketch::getTypecheckPass();
   
+  typecheck.pass(root);
+  
   std::cout << "Parser output :" << std::endl;
   print.pass(root);
-  typecheck.pass(root);
   
   litred.pass(root);
   
