@@ -28,12 +28,16 @@ namespace gpse
       EQ,
       EQUALS,
       SEMICOLON,
+      COMMA,
+      LCURLY,
+      RCURLY,
       NEQ,
       NUMBER,
       STRING,
       IDENT,
       TYPENAME,
       VARIABLENAME,
+      FUNCTIONNAME,
       K_TRUE,
       K_FALSE
     };

@@ -24,15 +24,32 @@ VariableNode::VariableNode(core::Variable const& value, lang::Node* parent) :
   Node(VARIABLE_NODE, parent),
   _m_value(value)
 {
-
+  
 }
 
 VariableNode::~VariableNode()
 {
-
+  
 }
 
 core::Variable const& VariableNode::value() const
+{
+  return _m_value;
+}
+
+FunctionCallNode::FunctionCallNode(core::Function const& value, lang::Node* parent) :
+  Node(FUNCTION_CALL_NODE, parent),
+  _m_value(value)
+{
+  
+}
+
+FunctionCallNode::~FunctionCallNode()
+{
+  
+}
+
+core::Function const& FunctionCallNode::value() const
 {
   return _m_value;
 }
@@ -142,4 +159,21 @@ StatementBlockNode::StatementBlockNode(lang::Node* parent) :
 StatementBlockNode::~StatementBlockNode()
 {
 
+}
+
+FunctionDeclarationNode::FunctionDeclarationNode(core::Function const& function, lang::Node* parent) :
+lang::Node(FUNCTION_DECLARATION_NODE, parent),
+  _m_function(function)
+{
+  
+}
+
+FunctionDeclarationNode::~FunctionDeclarationNode()
+{
+  
+}
+
+core::Function const& FunctionDeclarationNode::function() const
+{
+  return _m_function;
 }

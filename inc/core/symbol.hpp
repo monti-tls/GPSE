@@ -4,6 +4,8 @@
 #include "core/some.hpp"
 #include "core/variable.hpp"
 #include "core/type.hpp"
+#include "core/function.hpp"
+#include "core/symbol.hpp"
 
 namespace gpse
 {
@@ -15,13 +17,16 @@ namespace gpse
       Symbol();
       Symbol(Variable const& variable);
       Symbol(Type const& type);
+      Symbol(Function const& function);
       ~Symbol();
       
       bool isVariable() const;
       bool isType() const;
+      bool isFunction() const;
       
       Variable const& variable() const;
       Type const& type() const;
+      Function const& function() const;
       
     private:
       Some _m_value;

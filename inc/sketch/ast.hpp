@@ -4,6 +4,7 @@
 #include "lang/node.hpp"
 #include "core/type.hpp"
 #include "core/variable.hpp"
+#include "core/function.hpp"
 #include "core/literal.hpp"
 
 namespace gpse
@@ -15,10 +16,12 @@ namespace gpse
       LITERAL_NODE,
       EXPRESSION_NODE,
       VARIABLE_NODE,
+      FUNCTION_CALL_NODE,
       CAST_NODE,
       VARIABLE_DECL_NODE,
       VARIABLE_ASSIGN_NODE,
-      STATEMENT_BLOCK_NODE
+      STATEMENT_BLOCK_NODE,
+      FUNCTION_DECLARATION_NODE
     };
     
     class LiteralNode : public lang::Node
@@ -43,6 +46,18 @@ namespace gpse
       
     private:
       core::Variable _m_value;
+    };
+    
+    class FunctionCallNode : public lang::Node
+    {
+    public:
+      FunctionCallNode(core::Function const& value, lang::Node* parent = nullptr);
+      ~FunctionCallNode();
+      
+      core::Function const& value() const;
+      
+    private:
+      core::Function _m_value;
     };
     
     class CastNode : public lang::Node
@@ -127,6 +142,18 @@ namespace gpse
     public:
       StatementBlockNode(lang::Node* parent = nullptr);
       ~StatementBlockNode();
+    };
+    
+    class FunctionDeclarationNode : public lang::Node
+    {
+    public:
+      FunctionDeclarationNode(core::Function const& function, lang::Node* parent = nullptr);
+      ~FunctionDeclarationNode();
+      
+      core::Function const& function() const;
+      
+    private:
+      core::Function _m_function;
     };
   }
 }

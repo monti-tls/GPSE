@@ -21,6 +21,12 @@ Symbol::Symbol(Type const& type) :
   
 }
 
+Symbol::Symbol(Function const& function) :
+  _m_value(function)
+{
+  
+}
+
 Symbol::~Symbol()
 {
   
@@ -36,6 +42,11 @@ bool Symbol::isType() const
   return _m_value.is<Type>();
 }
 
+bool Symbol::isFunction() const
+{
+  return _m_value.is<Function>();
+}
+
 Variable const& Symbol::variable() const
 {
   return _m_value.cast<Variable>();
@@ -44,4 +55,9 @@ Variable const& Symbol::variable() const
 Type const& Symbol::type() const
 {
   return _m_value.cast<Type>();
+}
+
+Function const& Symbol::function() const
+{
+  return _m_value.cast<Function>();
 }

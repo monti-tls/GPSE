@@ -16,8 +16,10 @@ using namespace gpse;
 int main()
 {
   std::string str =
-  "bool foo = true && (bool) \"0\";\n"
-  "int fee = (int) false || (bool) 0;\n"
+  "int function(float a, int b)\n"
+  "{\n"
+  "  int foo = 3*2*a*function(a, b);\n"
+  "}\n"
   ;
   
   std::istringstream ss(str);
@@ -29,7 +31,7 @@ int main()
   lang::Parser parser(lexer);
   sketch::setupParser(parser);
   
-  lang::Node* root = parser.parseRaw("statement_block");
+  lang::Node* root = parser.parseRaw("function_declaration");
   if (!root)
     return -1;
   

@@ -4,16 +4,16 @@ using namespace gpse;
 using namespace lang;
 
 TreePass::TreePass() :
-  _m_defaultOp(
-    [=](Node*& node){
-      for (Node*& child : node->children())
-      {
-        this->pass(child);
-      }
-    }
-  )
+  _m_defaultOp()
 {
-  
+  _m_defaultOp =
+  [=](Node*& node)
+  {
+    for (Node*& child : node->children())
+    {
+      this->pass(child);
+    }
+  };
 }
 
 TreePass::~TreePass()

@@ -4,13 +4,16 @@ using namespace gpse;
 using namespace core;
 
 ScopeLayer::ScopeLayer(ScopeLayer* parent, ScopeLayer* child) :
-_m_parent(parent),
-_m_child(child)
+  _m_parent(parent),
+  _m_child(child)
 {}
 
 ScopeLayer::~ScopeLayer()
 {
-  delete _m_child;
+  if (_m_child)
+  {
+    delete _m_child;
+  }
 }
 
 void ScopeLayer::setParent(ScopeLayer* parent)
@@ -111,9 +114,7 @@ ScopeLayer& Scope::up()
 {
   if (_m_currentLayer->parent())
   {
-    ScopeLayer* parent = _m_currentLayer->parent();
-    delete _m_currentLayer;
-    _m_currentLayer = parent;
+    _m_currentLayer = _m_currentLayer->parent();
   }
   
   return *_m_currentLayer;

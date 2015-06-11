@@ -8,6 +8,7 @@ namespace gpse
   {
     void setupLexer(lang::Lexer& lexer)
     {
+      lexer.scope()->layer().addElement("nil", core::Symbol(core::Type::Nil));
       lexer.scope()->layer().addElement("int", core::Symbol(core::Type::Integer));
       lexer.scope()->layer().addElement("float", core::Symbol(core::Type::Floating));
       lexer.scope()->layer().addElement("string", core::Symbol(core::Type::String));
@@ -30,6 +31,9 @@ namespace gpse
       lexer.rules().push_back(lang::Rule::single(OR, "||"));
       lexer.rules().push_back(lang::Rule::single(NOT, '!'));
       lexer.rules().push_back(lang::Rule::single(SEMICOLON, ';'));
+      lexer.rules().push_back(lang::Rule::single(COMMA, ','));
+      lexer.rules().push_back(lang::Rule::single(LCURLY, '{'));
+      lexer.rules().push_back(lang::Rule::single(RCURLY, '}'));
       
       // LT / LTE
       lexer.rules().push_back(lang::Rule(
@@ -136,7 +140,7 @@ namespace gpse
         }
       ));
       
-      // IDENT, VARIABLENAME, TYPENAME and K_*
+      // IDENT, VARIABLENAME, FUNCTIONNAME, TYPENAME and K_*
       lexer.rules().push_back(lang::Rule(
         [](int h) -> bool
         {
@@ -167,7 +171,7 @@ namespace gpse
           {
             return lang::Token(kw_it->second);
           }
-          // else, try to find out if it is a type name or a variable name
+          // else, try to find out if it is a type, variable or function name
           else
           {
             core::Symbol sym;
@@ -180,6 +184,10 @@ namespace gpse
               else if (sym.isType())
               {
                 return lang::Token(TYPENAME, sym.type());
+              }
+              else if (sym.isFunction())
+              {
+                return lang::Token(FUNCTIONNAME, sym.function());
               }
             }
           }

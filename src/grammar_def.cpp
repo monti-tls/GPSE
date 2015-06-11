@@ -14,7 +14,8 @@ namespace gpse
         [](lang::Parser* p) -> bool
         {
           return p->seek().which == VARIABLENAME
-                                 || p->seek().which == NUMBER;
+              || p->seek().which == FUNCTIONNAME
+              || p->seek().which == NUMBER;
         },
         
         [](lang::Parser* p) -> lang::Node*
@@ -41,6 +42,50 @@ namespace gpse
             core::Variable variable = tok.value.cast<core::Variable>();
             VariableNode* node = new VariableNode(variable);
             node->setToken(tok);
+            return node;
+          }
+          else if (p->seek().which == FUNCTIONNAME)
+          {
+            p->eat(FUNCTIONNAME, tok);
+            lang::Token ptok = tok;
+            
+            core::Function function = tok.value.cast<core::Function>();
+            FunctionCallNode* node = new FunctionCallNode(function);
+            
+            if (!p->eat(LPAR, tok))
+            {
+              p->error("expected `)'");
+              delete node;
+              return nullptr;
+            }
+            
+            if (p->seek().which != RPAR)
+            {
+              do
+              {
+                if (p->seek() == COMMA)
+                {
+                  p->eat(COMMA, tok);
+                }
+                
+                lang::Node* arg = p->parse("expression");
+                if (!arg)
+                {
+                  delete node;
+                  return nullptr;
+                }
+                
+                node->addChild(arg);
+              } while (p->seek() == COMMA);
+            }
+            
+            if (!p->eat(RPAR, tok))
+            {
+              p->error("expected `)'");
+              delete node;
+              return nullptr;
+            }
+            
             return node;
           }
           else if (p->seek().which == LPAR)
@@ -540,6 +585,132 @@ namespace gpse
           return block;
         }
       );
+      
+      parser.grammars()["function_declaration"] = lang::Grammar(
+       [](lang::Parser* p) -> bool
+       {
+         return p->seek().which == TYPENAME;
+       },
+     
+       [](lang::Parser* p) -> lang::Node*
+       {
+         lang::Token tok;
+         
+         p->eat(TYPENAME, tok);
+         core::Type ret = tok.value.cast<core::Type>();
+         
+         if (!p->eat(IDENT, tok))
+         {
+           p->error("expected identifier");
+           return nullptr;
+         }
+         lang::Token ptok = tok;
+         std::string name = tok.value.cast<std::string>();
+         
+         core::Prototype prototype(ret);
+         
+         if (!p->eat(LPAR, tok))
+         {
+           p->error("expected `('");
+           return nullptr;
+         }
+         
+         p->scope()->down();
+         
+         if (p->seek().which != RPAR)
+         {
+           do
+           {
+             if (p->seek().which == COMMA)
+             {
+               p->eat(COMMA, tok);
+             }
+             
+             if (!p->eat(TYPENAME, tok))
+             {
+               p->error("expected typename");
+               return nullptr;
+             }
+             core::Type type = tok.value.cast<core::Type>();
+             
+             std::string name;
+             if (p->seek().which == IDENT)
+             {
+               p->eat(IDENT, tok);
+               name = tok.value.cast<std::string>();
+             }
+             else if (p->seek().which == VARIABLENAME)
+             {
+               p->eat(VARIABLENAME, tok);
+               name = tok.value.cast<core::Variable>().name();
+              
+               if (p->scope()->layer().findInScope(name))
+               {
+                 p->error("redeclaration of variable `" + name + "'");
+                 return nullptr;
+               }
+               
+             }
+             else if (p->seek().which == FUNCTIONNAME)
+             {
+               p->eat(FUNCTIONNAME, tok);
+               name = tok.value.cast<core::Function>().name();
+             }
+             else
+             {
+               p->error("ecpected identifier");
+               return nullptr;
+             }
+             
+             core::Variable variable(name, type);
+             p->scope()->layer().addElement(name, variable);
+             prototype.args().push_back(variable);
+           } while (p->seek().which == COMMA);
+         }
+         
+         if (!p->eat(RPAR, tok))
+         {
+           p->error("expected `)'");
+           return nullptr;
+         }
+         
+         core::Function function(name, prototype);
+         p->scope()->layer().parent()->addElement(name, function);
+         FunctionDeclarationNode* node = new FunctionDeclarationNode(function);
+         node->setToken(ptok);
+         
+         if (!p->eat(LCURLY, tok))
+         {
+           delete node;
+           p->error("expected `{'");
+           return nullptr;
+         }
+         
+         if (p->seek().which != RCURLY)
+         {
+           lang::Node* block = p->parse("statement_block");
+           if (!block)
+           {
+             delete node;
+             return nullptr;
+           }
+           
+           node->addChild(block);
+         }
+         
+         if (!p->eat(RCURLY, tok))
+         {
+           p->error("expected `}'");
+           delete node;
+           return nullptr;
+         }
+         
+         p->scope()->up();
+         
+         return node;
+       }
+     );
+
     }
   }
 }

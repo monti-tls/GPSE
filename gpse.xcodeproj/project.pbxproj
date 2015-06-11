@@ -23,6 +23,7 @@
 		FA432E5E1B28AD0C00214364 /* symbol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA432E5D1B28AD0C00214364 /* symbol.cpp */; };
 		FA432E601B28AE5800214364 /* scope.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA432E5F1B28AE5800214364 /* scope.cpp */; };
 		FA432E621B28C82700214364 /* variable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA432E611B28C82700214364 /* variable.cpp */; };
+		FA432E651B29B95500214364 /* function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA432E641B29B95500214364 /* function.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -73,6 +74,8 @@
 		FA432E5D1B28AD0C00214364 /* symbol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = symbol.cpp; path = src/symbol.cpp; sourceTree = SOURCE_ROOT; };
 		FA432E5F1B28AE5800214364 /* scope.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scope.cpp; path = src/scope.cpp; sourceTree = SOURCE_ROOT; };
 		FA432E611B28C82700214364 /* variable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = variable.cpp; path = src/variable.cpp; sourceTree = SOURCE_ROOT; };
+		FA432E631B29B7F800214364 /* function.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = function.hpp; sourceTree = "<group>"; };
+		FA432E641B29B95500214364 /* function.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = function.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,6 +118,7 @@
 				FA432E1B1B28A00300214364 /* some.hpp */,
 				FA432E1C1B28A00300214364 /* type.hpp */,
 				FA432E1D1B28A00300214364 /* variable.hpp */,
+				FA432E631B29B7F800214364 /* function.hpp */,
 			);
 			path = core;
 			sourceTree = "<group>";
@@ -161,6 +165,7 @@
 				FA432E391B28A00300214364 /* pass_def.cpp */,
 				FA432E3A1B28A00300214364 /* rule.cpp */,
 				FA432E3B1B28A00300214364 /* rule_def.cpp */,
+				FA432E641B29B95500214364 /* function.cpp */,
 				FA432E3C1B28A00300214364 /* token.cpp */,
 				FA432E3D1B28A00300214364 /* treepass.cpp */,
 			);
@@ -249,6 +254,7 @@
 				FA432E4E1B28A06D00214364 /* grammar.cpp in Sources */,
 				FA432E621B28C82700214364 /* variable.cpp in Sources */,
 				FA432E601B28AE5800214364 /* scope.cpp in Sources */,
+				FA432E651B29B95500214364 /* function.cpp in Sources */,
 				FA432E4F1B28A06D00214364 /* grammar_def.cpp in Sources */,
 				FA432E501B28A06D00214364 /* lexer.cpp in Sources */,
 				FA432E511B28A06D00214364 /* literal.cpp in Sources */,
@@ -405,6 +411,7 @@
 				FA432E4B1B28A04C00214364 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

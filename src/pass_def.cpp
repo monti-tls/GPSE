@@ -58,6 +58,32 @@ namespace gpse
         }
       );
       
+      pass.addOperator<FUNCTION_CALL_NODE, FunctionCallNode>(
+      [](lang::TreePass* pass, lang::Node*& node, FunctionCallNode* call)
+        {
+          for (int i = 0; i < indent; ++i)
+          {
+            std::cout << "  ";
+          }
+          
+          std::cout << "[function call: " << call->value().name() << std::endl;
+          
+          ++indent;
+          for (lang::Node*& child : call->children())
+          {
+            pass->pass(child);
+          }
+          --indent;
+          
+          for (int i = 0; i < indent; ++i)
+          {
+            std::cout << "  ";
+          }
+          
+          std::cout << "]" << std::endl;
+        }
+      );
+      
       pass.addOperator<CAST_NODE, CastNode>(
         [](lang::TreePass* pass, lang::Node*& node, CastNode* cast)
         {
@@ -222,6 +248,44 @@ namespace gpse
             pass->pass(*it);
           }
           --indent;
+          
+          for (int i = 0; i < indent; ++i)
+          {
+            std::cout << "  ";
+          }
+          
+          std::cout << "}" << std::endl;
+        }
+      );
+      
+      pass.addOperator<FUNCTION_DECLARATION_NODE, FunctionDeclarationNode>(
+      [](lang::TreePass* pass, lang::Node*& node, FunctionDeclarationNode* decl)
+        {
+          for (int i = 0; i < indent; ++i)
+          {
+            std::cout << "  ";
+          }
+          
+          std::cout << "{function_declaration : `" << decl->function().name() << "(";
+          for (auto arg = decl->function().prototype().args().begin();
+               arg != decl->function().prototype().args().end();
+               ++arg)
+          {
+            std::cout << arg->name();
+            if (++arg != decl->function().prototype().args().end())
+            {
+              std::cout << ", ";
+            }
+            --arg;
+          }
+          std::cout << ")'" << std::endl;
+          
+          if (decl->children().size())
+          {
+            ++indent;
+            pass->pass(decl->children()[0]);
+            --indent;
+          }
           
           for (int i = 0; i < indent; ++i)
           {
