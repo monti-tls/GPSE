@@ -23,6 +23,7 @@ namespace gpse
       
       void addElement(std::string const& name, Symbol const& element);
       bool find(std::string const& name, Symbol* element = nullptr);
+      bool findInScope(std::string const& name, Symbol* element = nullptr);
       
     private:
       ScopeLayer* _m_parent;

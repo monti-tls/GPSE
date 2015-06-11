@@ -106,7 +106,7 @@ void Lexer::skipWs()
   }
 }
 
-void Lexer::error(Token const& tok, std::string const& message)
+void Lexer::error(Token const& tok, std::string const& message) const
 {
   std::cerr << "line " << tok.debug.line << ", col " << tok.debug.col << ": error: " << message << std::endl;
   std::cerr << "    " << _M_wholeLine(tok) << std::endl;
@@ -135,10 +135,10 @@ Token Lexer::token()
     if (it->predicate(hint()))
     {
       tok = it->get(this);
-      skipWs();
       tok.debug.line = _m_line;
       tok.debug.col = _m_col;
       tok.debug.pos = _m_pos;
+      skipWs();
       return tok;
     }
   }
@@ -148,8 +148,9 @@ Token Lexer::token()
   return tok;
 }
 
-std::string Lexer::_M_wholeLine(Token const& tok)
+std::string Lexer::_M_wholeLine(Token const& tok) const
 {
+  _m_in.clear();
   int saved = _m_in.tellg();
   _m_in.seekg(0, std::ios::beg);
   

@@ -28,7 +28,6 @@ namespace gpse
       EQ,
       EQUALS,
       SEMICOLON,
-      QUOTE,
       NEQ,
       NUMBER,
       STRING,

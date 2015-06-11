@@ -3,8 +3,8 @@
 
 #include "lang/node.hpp"
 #include "core/type.hpp"
+#include "core/variable.hpp"
 #include "core/literal.hpp"
-#include "core/variablename.hpp"
 
 namespace gpse
 {
@@ -15,6 +15,7 @@ namespace gpse
       LITERAL_NODE,
       EXPRESSION_NODE,
       VARIABLE_NODE,
+      CAST_NODE,
       VARIABLE_DECL_NODE,
       VARIABLE_ASSIGN_NODE,
       STATEMENT_BLOCK_NODE
@@ -35,13 +36,25 @@ namespace gpse
     class VariableNode : public lang::Node
     {
     public:
-      VariableNode(core::VariableName const& value, lang::Node* parent = nullptr);
+      VariableNode(core::Variable const& value, lang::Node* parent = nullptr);
       ~VariableNode();
       
-      core::VariableName const& value() const;
+      core::Variable const& value() const;
       
     private:
-      core::VariableName _m_value;
+      core::Variable _m_value;
+    };
+    
+    class CastNode : public lang::Node
+    {
+    public:
+      CastNode(core::Type const& to, lang::Node* expr, lang::Node* parent = nullptr);
+      ~CastNode();
+      
+      core::Type const& to() const;
+      
+    private:
+      core::Type _m_to;
     };
     
     class ExpressionNode : public lang::Node
@@ -70,8 +83,8 @@ namespace gpse
       };
       
     public:
-      ExpressionNode(Unary what, ExpressionNode* expr, lang::Node* parent = nullptr);
-      ExpressionNode(Binary what, ExpressionNode* lhs, ExpressionNode* rhs, lang::Node* parent = nullptr);
+      ExpressionNode(Unary what, lang::Node* expr, lang::Node* parent = nullptr);
+      ExpressionNode(Binary what, lang::Node* lhs, lang::Node* rhs, lang::Node* parent = nullptr);
       ~ExpressionNode();
       
       bool isUnary() const;
@@ -88,27 +101,25 @@ namespace gpse
     class VariableDeclNode : public lang::Node
     {
     public:
-      VariableDeclNode(core::Type const& type, core::VariableName const& name, ExpressionNode* initialization = nullptr, lang::Node* parent = nullptr);
+      VariableDeclNode(core::Variable const& variable, ExpressionNode* initialization = nullptr, lang::Node* parent = nullptr);
       ~VariableDeclNode();
       
-      core::Type const& type() const;
-      core::VariableName const& name() const;
+      core::Variable const& variable() const;
       
     private:
-      core::Type _m_type;
-      core::VariableName _m_name;
+      core::Variable _m_variable;
     };
     
     class VariableAssignNode : public lang::Node
     {
     public:
-      VariableAssignNode(core::VariableName const& name, ExpressionNode* value, lang::Node* parent = nullptr);
+      VariableAssignNode(core::Variable const& variable, ExpressionNode* value, lang::Node* parent = nullptr);
       ~VariableAssignNode();
       
-      core::VariableName const& name() const;
+      core::Variable const& variable() const;
       
     private:
-      core::VariableName _m_name;
+      core::Variable _m_variable;
     };
     
     class StatementBlockNode : public lang::Node

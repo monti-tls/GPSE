@@ -30,7 +30,6 @@ namespace gpse
       lexer.rules().push_back(lang::Rule::single(OR, "||"));
       lexer.rules().push_back(lang::Rule::single(NOT, '!'));
       lexer.rules().push_back(lang::Rule::single(SEMICOLON, ';'));
-      lexer.rules().push_back(lang::Rule::single(QUOTE, '"'));
       
       // LT / LTE
       lexer.rules().push_back(lang::Rule(
@@ -174,9 +173,9 @@ namespace gpse
             core::Symbol sym;
             if (l->scope()->layer().find(temp, &sym))
             {
-              if (sym.isVariableName())
+              if (sym.isVariable())
               {
-                return lang::Token(VARIABLENAME, sym.variableName());
+                return lang::Token(VARIABLENAME, sym.variable());
               }
               else if (sym.isType())
               {
@@ -224,9 +223,9 @@ namespace gpse
             }
           }
           
-          l->eat('"');
+          // the trailing quote was already read in the loop
           
-          return lang::Token(IDENT, temp);
+          return lang::Token(STRING, temp);
         }
       ));
     }

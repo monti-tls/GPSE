@@ -9,8 +9,8 @@ Symbol::Symbol() :
   
 }
 
-Symbol::Symbol(VariableName const& variableName) :
-  _m_value(variableName)
+Symbol::Symbol(Variable const& Variable) :
+  _m_value(Variable)
 {
   
 }
@@ -26,9 +26,9 @@ Symbol::~Symbol()
   
 }
 
-bool Symbol::isVariableName() const
+bool Symbol::isVariable() const
 {
-  return _m_value.is<VariableName>();
+  return _m_value.is<Variable>();
 }
 
 bool Symbol::isType() const
@@ -36,9 +36,9 @@ bool Symbol::isType() const
   return _m_value.is<Type>();
 }
 
-VariableName const& Symbol::variableName() const
+Variable const& Symbol::variable() const
 {
-  return _m_value.cast<VariableName>();
+  return _m_value.cast<Variable>();
 }
 
 Type const& Symbol::type() const

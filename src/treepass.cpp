@@ -21,6 +21,26 @@ TreePass::~TreePass()
   
 }
 
+std::map<std::string, TreePass>& TreePass::subPasses()
+{
+  return _m_subpasses;
+}
+
+std::map<std::string, TreePass> const& TreePass::subPasses() const
+{
+  return _m_subpasses;
+}
+
+core::Some& TreePass::storage()
+{
+  return _m_storage;
+}
+
+core::Some const& TreePass::storage() const
+{
+  return _m_storage;
+}
+
 void TreePass::setDefaultOperator(std::function<void (TreePass*, Node*&)> const& op)
 {
   _m_defaultOp = [=](Node*& node)

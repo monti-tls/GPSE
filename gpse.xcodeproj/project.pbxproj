@@ -22,6 +22,7 @@
 		FA432E5A1B28A06D00214364 /* treepass.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA432E3D1B28A00300214364 /* treepass.cpp */; };
 		FA432E5E1B28AD0C00214364 /* symbol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA432E5D1B28AD0C00214364 /* symbol.cpp */; };
 		FA432E601B28AE5800214364 /* scope.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA432E5F1B28AE5800214364 /* scope.cpp */; };
+		FA432E621B28C82700214364 /* variable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA432E611B28C82700214364 /* variable.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -41,7 +42,7 @@
 		FA432E191B28A00300214364 /* scope.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = scope.hpp; sourceTree = "<group>"; };
 		FA432E1B1B28A00300214364 /* some.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = some.hpp; sourceTree = "<group>"; };
 		FA432E1C1B28A00300214364 /* type.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = type.hpp; sourceTree = "<group>"; };
-		FA432E1D1B28A00300214364 /* variablename.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = variablename.hpp; sourceTree = "<group>"; };
+		FA432E1D1B28A00300214364 /* variable.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = variable.hpp; sourceTree = "<group>"; };
 		FA432E1F1B28A00300214364 /* grammar.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = grammar.hpp; sourceTree = "<group>"; };
 		FA432E201B28A00300214364 /* lexer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = lexer.hpp; sourceTree = "<group>"; };
 		FA432E211B28A00300214364 /* node.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = node.hpp; sourceTree = "<group>"; };
@@ -71,6 +72,7 @@
 		FA432E5C1B28AC7A00214364 /* symbol.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = symbol.hpp; sourceTree = "<group>"; };
 		FA432E5D1B28AD0C00214364 /* symbol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = symbol.cpp; path = src/symbol.cpp; sourceTree = SOURCE_ROOT; };
 		FA432E5F1B28AE5800214364 /* scope.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scope.cpp; path = src/scope.cpp; sourceTree = SOURCE_ROOT; };
+		FA432E611B28C82700214364 /* variable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = variable.cpp; path = src/variable.cpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,7 +114,7 @@
 				FA432E5C1B28AC7A00214364 /* symbol.hpp */,
 				FA432E1B1B28A00300214364 /* some.hpp */,
 				FA432E1C1B28A00300214364 /* type.hpp */,
-				FA432E1D1B28A00300214364 /* variablename.hpp */,
+				FA432E1D1B28A00300214364 /* variable.hpp */,
 			);
 			path = core;
 			sourceTree = "<group>";
@@ -148,6 +150,7 @@
 				FA432E5D1B28AD0C00214364 /* symbol.cpp */,
 				FA432E5F1B28AE5800214364 /* scope.cpp */,
 				FA432E2F1B28A00300214364 /* ast.cpp */,
+				FA432E611B28C82700214364 /* variable.cpp */,
 				FA432E311B28A00300214364 /* grammar.cpp */,
 				FA432E321B28A00300214364 /* grammar_def.cpp */,
 				FA432E331B28A00300214364 /* lexer.cpp */,
@@ -244,6 +247,7 @@
 				FA432E4C1B28A06D00214364 /* ast.cpp in Sources */,
 				FA432E5E1B28AD0C00214364 /* symbol.cpp in Sources */,
 				FA432E4E1B28A06D00214364 /* grammar.cpp in Sources */,
+				FA432E621B28C82700214364 /* variable.cpp in Sources */,
 				FA432E601B28AE5800214364 /* scope.cpp in Sources */,
 				FA432E4F1B28A06D00214364 /* grammar_def.cpp in Sources */,
 				FA432E501B28A06D00214364 /* lexer.cpp in Sources */,

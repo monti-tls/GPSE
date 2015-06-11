@@ -1,14 +1,17 @@
 #include "lang/node.hpp"
+#include "lang/parser.hpp"
 
 #include <algorithm>
 
 using namespace gpse;
 using namespace lang;
 
-Node::Node(int which, Node* parent):
+Node::Node(int which, Node* parent, Parser* parser) :
   _m_which(which),
+  _m_parser(parser),
   _m_parent(parent)
 {
+  
 }
 
 Node::~Node()
@@ -22,6 +25,26 @@ Node::~Node()
 int Node::which() const
 {
   return _m_which;
+}
+
+void Node::setToken(Token const& token)
+{
+  _m_token = token;
+}
+
+Token const& Node::token() const
+{
+  return _m_token;
+}
+
+void Node::setParser(Parser* parser)
+{
+  _m_parser = parser;
+}
+
+Parser* Node::parser() const
+{
+  return _m_parser;
 }
 
 Node* Node::parent()
@@ -75,5 +98,13 @@ void Node::substituteChild(Node* oldChild, Node* newChild)
   {
     newChild->setParent(this);
     *it = newChild;
+  }
+}
+
+void Node::error(std::string const& message) const
+{
+  if (_m_parser)
+  {
+    _m_parser->error(message, _m_token);
   }
 }

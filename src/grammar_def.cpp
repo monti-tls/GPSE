@@ -24,28 +24,56 @@ namespace gpse
           if (p->seek().which == NUMBER)
           {
             p->eat(NUMBER, tok);
-            return new LiteralNode(tok.value);
+            LiteralNode* node = new LiteralNode(tok.value);
+            node->setToken(tok);
+            return node;
           }
           else if (p->seek().which == STRING)
           {
             p->eat(STRING, tok);
-            return new LiteralNode(tok.value);
+            LiteralNode* node = new LiteralNode(tok.value);
+            node->setToken(tok);
+            return node;
           }
           else if (p->seek().which == VARIABLENAME)
           {
             p->eat(VARIABLENAME, tok);
-            core::VariableName name = tok.value.cast<std::string>();
-            return new VariableNode(core::VariableName(name));
+            core::Variable variable = tok.value.cast<core::Variable>();
+            VariableNode* node = new VariableNode(variable);
+            node->setToken(tok);
+            return node;
           }
           else if (p->seek().which == LPAR)
           {
             p->eat(LPAR, tok);
-            ExpressionNode* expr = p->parse<ExpressionNode>("expression");
-            if (!p->eat(RPAR, tok))
+            
+            if (p->seek().which == TYPENAME)
             {
-              p->error("expected `)'");
+              p->eat(TYPENAME, tok);
+              lang::Token ptok = tok;
+              if (!p->eat(RPAR, tok))
+              {
+                p->error("expected `)'");
+                return nullptr;
+              }
+              ExpressionNode* expr = p->parse<ExpressionNode>("expression");
+              if (!expr)
+              {
+                return nullptr;
+              }
+              CastNode* node = new CastNode(ptok.value.cast<core::Type>(), expr);
+              node->setToken(ptok);
+              return node;
             }
-            return expr;
+            else
+            {
+              ExpressionNode* expr = p->parse<ExpressionNode>("expression");
+              if (!p->eat(RPAR, tok))
+              {
+                p->error("expected `)'");
+              }
+              return expr;
+            }
           }
           else if (p->seek().which == IDENT)
           {
@@ -55,12 +83,16 @@ namespace gpse
           else if (p->seek().which == K_TRUE)
           {
             p->eat(K_TRUE, tok);
-            return new LiteralNode(true);
+            LiteralNode* node = new LiteralNode(true);
+            node->setToken(tok);
+            return node;
           }
           else if (p->seek().which == K_FALSE)
           {
             p->eat(K_FALSE, tok);
-            return new LiteralNode(false);
+            LiteralNode* node = new LiteralNode(false);
+            node->setToken(tok);
+            return node;
           }
           else
           {
@@ -73,8 +105,8 @@ namespace gpse
       parser.grammars()["unary_not_term"] = lang::Grammar(
         [](lang::Parser* p) -> bool
         {
-          return p->seek().which == NOT
-                                 || p->predicate("atom");
+          return p->seek().which == NOT ||
+                 p->predicate("atom");
         },
         
         [](lang::Parser* p) -> lang::Node*
@@ -88,7 +120,7 @@ namespace gpse
             is = !is;
           }
           
-          ExpressionNode* atom = p->parse<ExpressionNode>("atom_term");
+          lang::Node* atom = p->parse("atom_term");
           
           if (!is || !atom)
           {
@@ -96,7 +128,9 @@ namespace gpse
           }
           else
           {
-            return new ExpressionNode(ExpressionNode::Unary::Not, atom);
+            ExpressionNode* node = new ExpressionNode(ExpressionNode::Unary::Not, atom);
+            node->setToken(tok);
+            return node;
           }
         }
       );
@@ -104,8 +138,8 @@ namespace gpse
       parser.grammars()["unary_neg_term"] = lang::Grammar(
         [](lang::Parser* p) -> bool
         {
-          return p->seek().which == MINUS
-                                 || p->predicate("unary_not_term");
+          return p->seek().which == MINUS ||
+                 p->predicate("unary_not_term");
         },
         
         [](lang::Parser* p) -> lang::Node*
@@ -127,7 +161,9 @@ namespace gpse
           }
           else
           {
-            return new ExpressionNode(ExpressionNode::Unary::Neg, expr);
+            ExpressionNode* node = new ExpressionNode(ExpressionNode::Unary::Neg, expr);
+            node->setToken(tok);
+            return node;
           }
         }
       );
@@ -171,6 +207,7 @@ namespace gpse
             }
             
             ExpressionNode* node = new ExpressionNode(op, expr, rhs);
+            node->setToken(tok);
             expr = node;
           }
           
@@ -217,6 +254,7 @@ namespace gpse
             }
             
             ExpressionNode* node = new ExpressionNode(op, expr, rhs);
+            node->setToken(tok);
             expr = node;
           }
           
@@ -287,6 +325,7 @@ namespace gpse
             }
             
             ExpressionNode* node = new ExpressionNode(op, expr, rhs);
+            node->setToken(tok);
             expr = node;
           }
           
@@ -333,6 +372,7 @@ namespace gpse
             }
             
             ExpressionNode* node = new ExpressionNode(op, expr, rhs);
+            node->setToken(tok);
             expr = node;
           }
           
@@ -371,7 +411,14 @@ namespace gpse
             return nullptr;
           }
           
-          core::VariableName name = tok.value.cast<core::VariableName>();
+          std::string name = tok.value.cast<std::string>();
+          
+          if (p->scope()->layer().findInScope(name))
+          {
+            p->error("variable `" + name + "' is already declared");
+            return nullptr;
+          }
+          
           ExpressionNode* expr = nullptr;
           
           if (p->seek().which == EQUALS)
@@ -384,7 +431,10 @@ namespace gpse
             }
           }
           
-          p->scope()->layer().addElement(name, core::Symbol(name));
+          lang::Token ptok = tok;
+          
+          core::Variable variable(name, type);
+          p->scope()->layer().addElement(name, core::Symbol(variable));
           
           if (!p->eat(SEMICOLON, tok))
           {
@@ -393,9 +443,12 @@ namespace gpse
               delete expr;
             }
             p->error("expected `;'");
+            return nullptr;
           }
           
-          return new VariableDeclNode(type, name, expr);
+          VariableDeclNode* node = new VariableDeclNode(variable, expr);
+          node->setToken(ptok);
+          return node;
         }
       );
       
@@ -413,13 +466,15 @@ namespace gpse
             p->error("expected variable identifier");
             return nullptr;
           }
-          core::VariableName name = tok.value.cast<std::string>();
+          core::Variable variable = tok.value.cast<core::Variable>();
           
           if (!p->eat(EQUALS, tok))
           {
             p->error("expected `='");
             return nullptr;
           }
+          
+          lang::Token ptok = tok;
           
           ExpressionNode* expr = p->parse<ExpressionNode>("expression");
           if (!expr)
@@ -434,7 +489,9 @@ namespace gpse
             return nullptr;
           }
           
-          return new VariableAssignNode(name, expr);
+          VariableAssignNode* node = new VariableAssignNode(variable, expr);
+          node->setToken(ptok);
+          return node;
         }
       );
       
@@ -447,17 +504,14 @@ namespace gpse
         
         [](lang::Parser* p) -> lang::Node*
         {
-          if (p->predicate("variable_declaration"))
-          {
-            return p->parse("variable_declaration");
-          }
-          else if (p->predicate("variable_assign"))
+          if (p->predicate("variable_assign"))
           {
             return p->parse("variable_assign");
           }
-          
-          p->error("expected statement");
-          return nullptr;
+          else // if (p->predicate("variable_declaration"))
+          {
+            return p->parse("variable_declaration");
+          }
         }
       );
       

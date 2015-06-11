@@ -9,6 +9,7 @@ namespace gpse
   {
     lang::TreePass getPrinterPass();
     lang::TreePass getLiteralReductionPass();
+    lang::TreePass getTypecheckPass();
   }
 }
 

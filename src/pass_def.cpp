@@ -1,5 +1,6 @@
 #include "sketch/pass_def.hpp"
 #include "sketch/ast.hpp"
+#include "lang/parser.hpp"
 
 #include <iostream>
 
@@ -53,7 +54,22 @@ namespace gpse
             std::cout << "  ";
           }
           
-          std::cout << "(variable) " << variable->value() << std::endl;
+          std::cout << "(variable) " << variable->value().name() << std::endl;
+        }
+      );
+      
+      pass.addOperator<CAST_NODE, CastNode>(
+        [](lang::TreePass* pass, lang::Node*& node, CastNode* cast)
+        {
+          for (int i = 0; i < indent; ++i)
+          {
+            std::cout << "  ";
+          }
+          
+          std::cout << "[cast]" << std::endl;
+          ++indent;
+          pass->pass(cast->children()[0]);
+          --indent;
         }
       );
       
@@ -149,7 +165,7 @@ namespace gpse
             std::cout << "  ";
           }
           
-          std::cout << "{variable declaration : `" << decl->name() << "'" << std::endl;
+          std::cout << "{variable declaration : `" << decl->variable().name() << "'" << std::endl;
           
           if (decl->children().size())
           {
@@ -175,7 +191,7 @@ namespace gpse
             std::cout << "  ";
           }
           
-          std::cout << "{variable assignment : `" << assign->name() << "'" << std::endl;
+          std::cout << "{variable assignment : `" << assign->variable().name() << "'" << std::endl;
           
           ++indent;
           pass->pass(assign->children()[0]);
@@ -227,6 +243,41 @@ namespace gpse
         [](lang::TreePass* pass, lang::Node*& node, LiteralNode* literal)
         {
           // a literal node is already reduced
+        }
+      );
+      
+      pass.addOperator<CAST_NODE, CastNode>(
+        [](lang::TreePass* pass, lang::Node*& node, CastNode* cast)
+        {
+          pass->pass(cast->children()[0]);
+          
+          if (cast->children()[0]->which() == LITERAL_NODE)
+          {
+            core::Literal const& value = static_cast<LiteralNode*>(cast->children()[0])->value();
+            core::Literal newValue = value;
+            
+            if (cast->to() == core::Type::Integer)
+            {
+              newValue = value.integer();
+            }
+            else if (cast->to() == core::Type::Floating)
+            {
+              newValue = value.floating();
+            }
+            else if (cast->to() == core::Type::String)
+            {
+              newValue = value.string();
+            }
+            else if (cast->to() == core::Type::Boolean)
+            {
+              newValue = value.boolean();
+            }
+            
+            LiteralNode* reduced = new LiteralNode(newValue);
+            reduced->setParent(cast->parent());
+            delete cast;
+            node = reduced;
+          }
         }
       );
       
@@ -416,6 +467,81 @@ namespace gpse
       );
       
       return pass;
+    }
+    
+    lang::TreePass getTypecheckPass()
+    {
+      lang::TreePass typeCheck;
+      
+      typeCheck.addOperator<LITERAL_NODE, LiteralNode>(
+        [](lang::TreePass* pass, lang::Node*& node, LiteralNode* literal)
+        {
+          pass->storage() = literal->value().type();
+        }
+      );
+      
+      typeCheck.addOperator<CAST_NODE, CastNode>(
+        [](lang::TreePass* pass, lang::Node*& node, CastNode* cast)
+        {
+          pass->pass(cast->children()[0]);
+          pass->storage() = cast->to();
+        }
+      );
+      
+      typeCheck.addOperator<EXPRESSION_NODE, ExpressionNode>(
+        [](lang::TreePass* pass, lang::Node*& node, ExpressionNode* expression)
+        {
+          if (expression->isUnary())
+          {
+            pass->pass(expression->children()[0]);
+          }
+          else if (expression->isBinary())
+          {
+            pass->pass(expression->children()[0]);
+            core::Type ltp = pass->storage().cast<core::Type>();
+            pass->pass(expression->children()[1]);
+            core::Type rtp = pass->storage().cast<core::Type>();
+            
+            if (ltp != rtp)
+            {
+              expression->error("invalid implicit type conversion");
+            }
+          }
+        }
+      );
+      
+      typeCheck.addOperator<VARIABLE_DECL_NODE, VariableDeclNode>(
+        [](lang::TreePass* pass, lang::Node*& node, VariableDeclNode* decl)
+        {
+          if (decl->children().size())
+          {
+            core::Type ltp = decl->variable().type();
+            pass->pass(decl->children()[0]);
+            core::Type rtp = pass->storage().cast<core::Type>();
+            
+            if (ltp != rtp)
+            {
+              decl->error("invalid implicit type conversion");
+            }
+          }
+        }
+      );
+      
+      typeCheck.addOperator<VARIABLE_ASSIGN_NODE, VariableAssignNode>(
+       [](lang::TreePass* pass, lang::Node*& node, VariableAssignNode* assign)
+       {
+         core::Type ltp = assign->variable().type();
+         pass->pass(assign->children()[0]);
+         core::Type rtp = pass->storage().cast<core::Type>();
+         
+         if (ltp != rtp)
+         {
+           assign->error("invalid implicit type conversion");
+         }
+       }
+      );
+      
+      return typeCheck;
     }
   }
 }

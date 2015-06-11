@@ -2,7 +2,7 @@
 #define __GPSE_CORE_SYMBOL_H__
 
 #include "core/some.hpp"
-#include "core/variablename.hpp"
+#include "core/variable.hpp"
 #include "core/type.hpp"
 
 namespace gpse
@@ -13,14 +13,14 @@ namespace gpse
     {
     public:
       Symbol();
-      Symbol(VariableName const& variable);
+      Symbol(Variable const& variable);
       Symbol(Type const& type);
       ~Symbol();
       
-      bool isVariableName() const;
+      bool isVariable() const;
       bool isType() const;
       
-      VariableName const& variableName() const;
+      Variable const& variable() const;
       Type const& type() const;
       
     private:

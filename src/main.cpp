@@ -16,16 +16,8 @@ using namespace gpse;
 int main()
 {
   std::string str =
-  "int foo = true || false;"//-5*20+0;\n"
-  "foo = 1.0/(4.0/3.0+1.0/3.0)*foo;\n"
-  "foo = 0+foo;\n"
-  "foo = foo+0*45;\n"
-  "foo = 0-foo;\n"
-  "foo = foo-0;\n"
-  "foo = 1*foo;\n"
-  "foo = foo*1;\n"
-  "foo = 1/foo;\n"
-  "foo = foo/1;\n"
+  "bool foo = true && (bool) \"0\";\n"
+  "int fee = (int) false || (bool) 0;\n"
   ;
   
   std::istringstream ss(str);
@@ -43,9 +35,11 @@ int main()
   
   lang::TreePass print = sketch::getPrinterPass();
   lang::TreePass litred = sketch::getLiteralReductionPass();
+  lang::TreePass typecheck = sketch::getTypecheckPass();
   
   std::cout << "Parser output :" << std::endl;
   print.pass(root);
+  typecheck.pass(root);
   
   litred.pass(root);
   

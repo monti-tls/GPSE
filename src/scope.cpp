@@ -59,6 +59,21 @@ bool ScopeLayer::find(std::string const& name, Symbol* element)
   return true;
 }
 
+bool ScopeLayer::findInScope(std::string const& name, Symbol* element)
+{
+  auto it = _m_content.find(name);
+  if (it != _m_content.end())
+  {
+    if (element)
+    {
+      *element = it->second;
+    }
+    return true;
+  }
+  
+  return false;
+}
+
 Scope::Scope() :
   _m_currentLayer(new ScopeLayer())
 {

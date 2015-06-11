@@ -37,12 +37,12 @@ namespace gpse
       bool eat(char c);
       bool eat(std::string const& str);
       void skipWs();
-      void error(Token const& tok, std::string const& message);
+      void error(Token const& tok, std::string const& message) const;
       
       Token token();
       
     private:
-      std::string _M_wholeLine(Token const& tok);
+      std::string _M_wholeLine(Token const& tok) const;
       
     private:
       std::istream& _m_in;

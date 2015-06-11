@@ -20,7 +20,7 @@ core::Literal const & LiteralNode::value() const
   return _m_value;
 }
 
-VariableNode::VariableNode(core::VariableName const& value, lang::Node* parent) :
+VariableNode::VariableNode(core::Variable const& value, lang::Node* parent) :
   Node(VARIABLE_NODE, parent),
   _m_value(value)
 {
@@ -32,14 +32,29 @@ VariableNode::~VariableNode()
 
 }
 
-core::VariableName const& VariableNode::value() const
+core::Variable const& VariableNode::value() const
 {
   return _m_value;
 }
 
+CastNode::CastNode(core::Type const& to, lang::Node* expr, lang::Node* parent) :
+  Node(CAST_NODE, parent),
+  _m_to(to)
+{
+  addChild(expr);
+}
 
+CastNode::~CastNode()
+{
+  
+}
 
-ExpressionNode::ExpressionNode(ExpressionNode::Unary what, ExpressionNode* expr, lang::Node* parent) :
+core::Type const& CastNode::to() const
+{
+  return _m_to;
+}
+
+ExpressionNode::ExpressionNode(ExpressionNode::Unary what, lang::Node* expr, lang::Node* parent) :
   lang::Node(EXPRESSION_NODE, parent),
   _m_unary(what),
   _m_binary((Binary) -1)
@@ -47,7 +62,7 @@ ExpressionNode::ExpressionNode(ExpressionNode::Unary what, ExpressionNode* expr,
   addChild(expr);
 }
 
-ExpressionNode::ExpressionNode(ExpressionNode::Binary what, ExpressionNode* lhs, ExpressionNode* rhs, lang::Node* parent) :
+ExpressionNode::ExpressionNode(ExpressionNode::Binary what, lang::Node* lhs, lang::Node* rhs, lang::Node* parent) :
   lang::Node(EXPRESSION_NODE, parent),
   _m_unary((Unary) -1),
   _m_binary(what)
@@ -81,10 +96,9 @@ ExpressionNode::Binary ExpressionNode::binaryOperation() const
   return _m_binary;
 }
 
-VariableDeclNode::VariableDeclNode(core::Type const& type, core::VariableName const& name, ExpressionNode* value, lang::Node* parent) :
+VariableDeclNode::VariableDeclNode(core::Variable const& variable, ExpressionNode* value, lang::Node* parent) :
   lang::Node(VARIABLE_DECL_NODE, parent),
-  _m_type(type),
-  _m_name(name)
+  _m_variable(variable)
 {
   if (value)
   {
@@ -97,19 +111,14 @@ VariableDeclNode::~VariableDeclNode()
   
 }
 
-core::Type const& VariableDeclNode::type() const
+core::Variable const& VariableDeclNode::variable() const
 {
-  return _m_type;
+  return _m_variable;
 }
 
-const core::VariableName& VariableDeclNode::name() const
-{
-  return _m_name;
-}
-
-VariableAssignNode::VariableAssignNode(core::VariableName const& name, ExpressionNode* value, lang::Node* parent) :
+VariableAssignNode::VariableAssignNode(core::Variable const& variable, ExpressionNode* value, lang::Node* parent) :
   lang::Node(VARIABLE_ASSIGN_NODE, parent),
-  _m_name(name)
+  _m_variable(variable)
 {
   addChild(value);
 }
@@ -119,9 +128,9 @@ VariableAssignNode::~VariableAssignNode()
   
 }
 
-core::VariableName const& VariableAssignNode::name() const
+core::Variable const& VariableAssignNode::variable() const
 {
-  return _m_name;
+  return _m_variable;
 }
 
 StatementBlockNode::StatementBlockNode(lang::Node* parent) :

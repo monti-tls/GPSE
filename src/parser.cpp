@@ -75,10 +75,20 @@ Node* Parser::parseRaw(std::string const& grammar)
     return nullptr;
   }
   
-  return it->second.get(this);
+  Node* node = it->second.get(this);
+  if (node)
+  {
+    node->setParser(this);
+  }
+  return node;
 }
 
-void Parser::error(std::string const& message)
+void Parser::error(std::string const& message, Token const& tok) const
+{
+  _m_lexer.error(tok, message);
+}
+
+void Parser::error(std::string const& message) const
 {
   _m_lexer.error(_m_current, message);
 }

@@ -28,7 +28,8 @@ namespace gpse
       Token seek();
       bool predicate(std::string const& grammar);
       Node* parseRaw(std::string const& grammar);
-      void error(std::string const& message);
+      void error(std::string const& message, Token const& tok) const;
+      void error(std::string const& message) const;
       
       template <typename T = lang::Node>
       T* parse(std::string const& grammar)
