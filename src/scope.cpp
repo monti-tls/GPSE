@@ -3,16 +3,15 @@
 using namespace gpse;
 using namespace core;
 
-ScopeLayer::ScopeLayer(ScopeLayer* parent, ScopeLayer* child) :
-  _m_parent(parent),
-  _m_child(child)
+ScopeLayer::ScopeLayer(ScopeLayer* parent) :
+  _m_parent(parent)
 {}
 
 ScopeLayer::~ScopeLayer()
 {
-  if (_m_child)
+  for (auto child : _m_children)
   {
-    delete _m_child;
+    delete child;
   }
 }
 
@@ -26,14 +25,14 @@ ScopeLayer* ScopeLayer::parent() const
   return _m_parent;
 }
 
-void ScopeLayer::setChild(ScopeLayer* child)
+std::vector<ScopeLayer*>& ScopeLayer::children()
 {
-  _m_child = child;
+  return _m_children;
 }
 
-ScopeLayer* ScopeLayer::child() const
+std::vector<ScopeLayer*> const& ScopeLayer::children() const
 {
-  return _m_child;
+  return _m_children;
 }
 
 void ScopeLayer::addElement(std::string const& name, Symbol const& element)
@@ -101,12 +100,9 @@ ScopeLayer const& Scope::layer() const
 
 ScopeLayer& Scope::down()
 {
-  if (!_m_currentLayer->child())
-  {
-    _m_currentLayer->setChild(new ScopeLayer(_m_currentLayer));
-  }
-  
-  _m_currentLayer = _m_currentLayer->child();
+  ScopeLayer* child = new ScopeLayer(_m_currentLayer);
+  _m_currentLayer->children().push_back(child);
+  _m_currentLayer = child;
   return *_m_currentLayer;
 }
 

@@ -2,6 +2,7 @@
 #define __GPSE_LANG_NODE_H__
 
 #include "lang/token.hpp"
+#include "core/scope.hpp"
 
 #include <vector>
 
@@ -22,6 +23,8 @@ namespace gpse
       Token const& token() const;
       void setParser(Parser* parser);
       Parser* parser() const;
+      void setScope(core::Scope* scope);
+      core::Scope* scope() const;
       
       Node* parent();
       void setParent(Node* parent);
@@ -38,6 +41,7 @@ namespace gpse
       lang::Token _m_token;
       Parser* _m_parser;
       Node* _m_parent;
+      core::Scope* _m_scope;
       std::vector<Node*> _m_children;
     };
   }

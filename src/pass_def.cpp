@@ -552,6 +552,42 @@ namespace gpse
         }
       );
       
+      typeCheck.addOperator<VARIABLE_NODE, VariableNode>(
+        [](lang::TreePass* pass, lang::Node*& node, VariableNode* variable)
+        {
+          pass->storage() = variable->value().type();
+        }
+      );
+      
+      typeCheck.addOperator<FUNCTION_CALL_NODE, FunctionCallNode>(
+        [](lang::TreePass* pass, lang::Node*& node, FunctionCallNode* call)
+        {
+          core::Prototype const& prototype = call->value().prototype();
+          
+          if (prototype.args().size() != call->children().size())
+          {
+            node->error("wrong number of arguments in function call");
+          }
+          else
+          {
+            auto arg_it = prototype.args().begin();
+            for (lang::Node*& child : call->children())
+            {
+              pass->pass(child);
+              core::Type rtp = pass->storage().cast<core::Type>();
+              if (arg_it->type() != rtp)
+              {
+                child->error("invalid implicit type conversion");
+                break;
+              }
+              ++arg_it;
+            }
+          }
+          
+          pass->storage() = prototype.ret();
+        }
+      );
+      
       typeCheck.addOperator<EXPRESSION_NODE, ExpressionNode>(
         [](lang::TreePass* pass, lang::Node*& node, ExpressionNode* expression)
         {

@@ -9,7 +9,8 @@ using namespace lang;
 Node::Node(int which, Node* parent, Parser* parser) :
   _m_which(which),
   _m_parser(parser),
-  _m_parent(parent)
+  _m_parent(parent),
+  _m_scope(nullptr)
 {
   
 }
@@ -45,6 +46,16 @@ void Node::setParser(Parser* parser)
 Parser* Node::parser() const
 {
   return _m_parser;
+}
+
+void Node::setScope(core::Scope* scope)
+{
+  _m_scope = scope;
+}
+
+core::Scope* Node::scope() const
+{
+  return _m_scope;
 }
 
 Node* Node::parent()

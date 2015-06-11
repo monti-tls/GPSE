@@ -13,13 +13,13 @@ namespace gpse
     class ScopeLayer
     {
     public:
-      ScopeLayer(ScopeLayer* parent = nullptr, ScopeLayer* child = nullptr);
+      ScopeLayer(ScopeLayer* parent = nullptr);
       ~ScopeLayer();
       
       void setParent(ScopeLayer* parent);
       ScopeLayer* parent() const;
-      void setChild(ScopeLayer* child);
-      ScopeLayer* child() const;
+      std::vector<ScopeLayer*>& children();
+      std::vector<ScopeLayer*> const& children() const;
       
       void addElement(std::string const& name, Symbol const& element);
       bool find(std::string const& name, Symbol* element = nullptr);
@@ -27,7 +27,7 @@ namespace gpse
       
     private:
       ScopeLayer* _m_parent;
-      ScopeLayer* _m_child;
+      std::vector<ScopeLayer*> _m_children;
       std::map<std::string, Symbol> _m_content;
     };
     

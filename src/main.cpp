@@ -16,9 +16,10 @@ using namespace gpse;
 int main()
 {
   std::string str =
-  "int function(float a, int b)\n"
+  "int function(int n)\n"
   "{\n"
-  "  int foo = 3*2*a*function(a, b);\n"
+  "  int fee = (int) 1.0/2.0 + 3.0/4.0 + 5.0/6.0;\n"
+  "  int foo = fee*function(n-1);\n"
   "}\n"
   ;
   

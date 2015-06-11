@@ -79,6 +79,7 @@ Node* Parser::parseRaw(std::string const& grammar)
   if (node)
   {
     node->setParser(this);
+    node->setScope(scope());
   }
   return node;
 }
