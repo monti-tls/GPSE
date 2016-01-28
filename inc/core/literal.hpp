@@ -34,6 +34,7 @@ namespace gpse
       bool isFloating() const;
       bool isString() const;
       
+      core::Some const& value() const;
       bool boolean() const;
       int integer() const;
       float floating() const;

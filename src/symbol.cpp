@@ -47,14 +47,29 @@ bool Symbol::isFunction() const
   return _m_value.is<Function>();
 }
 
+Variable& Symbol::variable()
+{
+  return _m_value.cast<Variable>();
+}
+
 Variable const& Symbol::variable() const
 {
   return _m_value.cast<Variable>();
 }
 
+Type& Symbol::type()
+{
+  return _m_value.cast<Type>();
+}
+
 Type const& Symbol::type() const
 {
   return _m_value.cast<Type>();
+}
+
+Function& Symbol::function()
+{
+  return _m_value.cast<Function>();
 }
 
 Function const& Symbol::function() const

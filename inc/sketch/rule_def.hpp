@@ -28,6 +28,7 @@ namespace gpse
       EQ,
       EQUALS,
       SEMICOLON,
+      RETURNS,
       COMMA,
       LCURLY,
       RCURLY,
@@ -40,7 +41,8 @@ namespace gpse
       FUNCTIONNAME,
       K_TRUE,
       K_FALSE,
-      K_RETURN
+      K_RETURN,
+      K_FUN
     };
     
     void setupLexer(lang::Lexer& lexer);

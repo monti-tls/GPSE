@@ -9,21 +9,16 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <fstream>
 #include <map>
+#include <stack>
 
 using namespace gpse;
 
 int main()
-{
-  std::string str =
-  "int function(int n)\n"
-  "{\n"
-  "  int fee = (int) 1.0/2.0 + 3.0/4.0 + 5.0/6.0;\n"
-  "  return fee*function(n-1);\n"
-  "}\n"
-  ;
-  
-  std::istringstream ss(str);
+{ 
+  // std::istringstream ss(str);
+  std::ifstream ss("src/sample.sketch");
   
   core::Scope* scope = new core::Scope();
   lang::Lexer lexer(ss, scope);
@@ -32,23 +27,29 @@ int main()
   lang::Parser parser(lexer);
   sketch::setupParser(parser);
   
-  lang::Node* root = parser.parseRaw("function_declaration");
+  lang::Node* root = parser.parseRaw("program");
   if (!root)
     return -1;
   
   lang::TreePass print = sketch::getPrinterPass();
-  lang::TreePass litred = sketch::getLiteralReductionPass();
   lang::TreePass typecheck = sketch::getTypecheckPass();
+  lang::TreePass optimize = sketch::getOptimizePass();
+  lang::TreePass run = sketch::getRunPass();
   
   typecheck.pass(root);
   
   std::cout << "Parser output :" << std::endl;
   print.pass(root);
   
-  litred.pass(root);
+  optimize.pass(root);
   
-  std::cout << "After literal reduction pass :" << std::endl;
+  std::cout << "After optimization pass :" << std::endl;
   print.pass(root);
+
+  std::cout << "** Running program **" << std::endl;
+  run.pass(root);
+
+  std::cout << scope->layer().findRef("foo")->variable().value().cast<int>() << std::endl;
   
   delete root;
   delete scope;

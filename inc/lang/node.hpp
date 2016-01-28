@@ -25,6 +25,8 @@ namespace gpse
       Parser* parser() const;
       void setScope(core::Scope* scope);
       core::Scope* scope() const;
+      void setScopeLayer(core::ScopeLayer* layer);
+      core::ScopeLayer* scopeLayer() const;
       
       Node* parent();
       void setParent(Node* parent);
@@ -42,6 +44,7 @@ namespace gpse
       Parser* _m_parser;
       Node* _m_parent;
       core::Scope* _m_scope;
+      core::ScopeLayer * _m_scopeLayer;
       std::vector<Node*> _m_children;
     };
   }

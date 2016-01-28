@@ -9,6 +9,11 @@
 
 namespace gpse
 {
+  namespace lang
+  {
+    class Node;
+  }
+  
   namespace core
   {
     class Prototype
@@ -19,6 +24,8 @@ namespace gpse
       ~Prototype();
       
       Type const& ret() const;
+      void setRet(Type const& ret);
+      
       std::vector<Variable>& args();
       std::vector<Variable> const& args() const;
       
@@ -36,10 +43,14 @@ namespace gpse
       
       std::string const& name() const;
       Prototype const& prototype() const;
+
+      void setNode(lang::Node* node);
+      lang::Node* node() const;
       
     private:
       std::string _m_name;
       Prototype _m_prototype;
+      lang::Node* _m_node;
     };
   }
 }

@@ -80,6 +80,8 @@ Node* Parser::parseRaw(std::string const& grammar)
   {
     node->setParser(this);
     node->setScope(scope());
+    if (!node->scopeLayer())
+      node->setScopeLayer(&scope()->layer());
   }
   return node;
 }

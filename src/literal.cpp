@@ -116,6 +116,11 @@ bool Literal::isString() const
   return _m_value.is<std::string>();
 }
 
+core::Some const& Literal::value() const
+{
+  return _m_value;
+}
+
 bool Literal::boolean() const
 {
   if (isNil())

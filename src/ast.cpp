@@ -191,3 +191,14 @@ core::Function const& FunctionDeclarationNode::function() const
 {
   return _m_function;
 }
+
+ProgramNode::ProgramNode(lang::Node* parent) :
+  lang::Node(PROGRAM_NODE, parent)
+{
+
+}
+
+ProgramNode::~ProgramNode()
+{
+
+}

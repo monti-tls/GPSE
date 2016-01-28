@@ -27,6 +27,11 @@ Type const& Prototype::ret() const
   return _m_ret;
 }
 
+void Prototype::setRet(Type const& ret)
+{
+  _m_ret = ret;
+}
+
 std::vector<Variable>& Prototype::args()
 {
   return _m_args;
@@ -39,7 +44,8 @@ std::vector<Variable> const& Prototype::args() const
 
 Function::Function() :
   _m_name(),
-  _m_prototype()
+  _m_prototype(),
+  _m_node(nullptr)
 {
   
 }
@@ -64,4 +70,14 @@ std::string const& Function::name() const
 Prototype const& Function::prototype() const
 {
   return _m_prototype;
+}
+
+void Function::setNode(lang::Node* node)
+{
+  _m_node = node;
+}
+
+lang::Node* Function::node() const
+{
+  return _m_node;
 }

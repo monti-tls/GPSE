@@ -10,7 +10,8 @@ Node::Node(int which, Node* parent, Parser* parser) :
   _m_which(which),
   _m_parser(parser),
   _m_parent(parent),
-  _m_scope(nullptr)
+  _m_scope(nullptr),
+  _m_scopeLayer(nullptr)
 {
   
 }
@@ -56,6 +57,16 @@ void Node::setScope(core::Scope* scope)
 core::Scope* Node::scope() const
 {
   return _m_scope;
+}
+
+void Node::setScopeLayer(core::ScopeLayer* layer)
+{
+  _m_scopeLayer = layer;
+}
+
+core::ScopeLayer* Node::scopeLayer() const
+{
+  return _m_scopeLayer;
 }
 
 Node* Node::parent()

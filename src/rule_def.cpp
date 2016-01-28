@@ -34,6 +34,7 @@ namespace gpse
       lexer.rules().push_back(lang::Rule::single(COMMA, ','));
       lexer.rules().push_back(lang::Rule::single(LCURLY, '{'));
       lexer.rules().push_back(lang::Rule::single(RCURLY, '}'));
+      lexer.rules().push_back(lang::Rule::single(RETURNS, '~'));
       
       // LT / LTE
       lexer.rules().push_back(lang::Rule(
@@ -165,6 +166,7 @@ namespace gpse
           keywords["true"] = K_TRUE;
           keywords["false"] = K_FALSE;
           keywords["return"] = K_RETURN;
+          keywords["fun"] = K_FUN;
           auto kw_it = keywords.find(temp);
           
           // if the identifier is a valid keyword

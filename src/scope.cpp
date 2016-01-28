@@ -42,38 +42,47 @@ void ScopeLayer::addElement(std::string const& name, Symbol const& element)
 
 bool ScopeLayer::find(std::string const& name, Symbol* element)
 {
+  Symbol* sym = findRef(name);
+  if (sym && element)
+    *element = *sym;
+  
+  return sym;
+}
+
+bool ScopeLayer::findInScope(std::string const& name, Symbol* element)
+{
+  Symbol* sym = findRefInScope(name);
+  if (sym && element)
+    *element = *sym;
+  
+  return sym;
+}
+
+Symbol* ScopeLayer::findRef(std::string const& name)
+{
   auto it = _m_content.find(name);
   if (it == _m_content.end())
   {
     if (_m_parent)
     {
-      return _m_parent->find(name, element);
+      return _m_parent->findRef(name);
     }
     
-    return false;
+    return nullptr;
   }
   
-  if (element)
-  {
-    *element = it->second;
-  }
-  
-  return true;
+  return &it->second;
 }
 
-bool ScopeLayer::findInScope(std::string const& name, Symbol* element)
+Symbol* ScopeLayer::findRefInScope(std::string const& name)
 {
   auto it = _m_content.find(name);
   if (it != _m_content.end())
   {
-    if (element)
-    {
-      *element = it->second;
-    }
-    return true;
+    return &it->second;
   }
   
-  return false;
+  return nullptr;
 }
 
 Scope::Scope() :

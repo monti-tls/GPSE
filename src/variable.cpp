@@ -12,7 +12,8 @@ Variable::Variable() :
 
 Variable::Variable(std::string const& name, core::Type const& type) :
   _m_name(name),
-  _m_type(type)
+  _m_type(type),
+  _m_value()
 {
   
 }
@@ -40,4 +41,14 @@ void Variable::setType(core::Type const& type)
 core::Type const& Variable::type() const
 {
   return _m_type;
+}
+
+void Variable::setValue(core::Some const& value)
+{
+  _m_value = value;
+}
+
+core::Some const& Variable::value() const
+{
+  return _m_value;
 }

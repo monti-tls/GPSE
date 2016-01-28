@@ -22,7 +22,8 @@ namespace gpse
       VARIABLE_ASSIGN_NODE,
       RETURN_STATEMENT_NODE,
       STATEMENT_BLOCK_NODE,
-      FUNCTION_DECLARATION_NODE
+      FUNCTION_DECLARATION_NODE,
+      PROGRAM_NODE
     };
     
     class LiteralNode : public lang::Node
@@ -162,6 +163,13 @@ namespace gpse
       
     private:
       core::Function _m_function;
+    };
+
+    class ProgramNode : public lang::Node
+    {
+    public:
+      ProgramNode(lang::Node* parent = nullptr);
+      ~ProgramNode();
     };
   }
 }

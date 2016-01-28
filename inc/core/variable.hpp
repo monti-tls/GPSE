@@ -2,6 +2,7 @@
 #define __CORE_VARIABLE_NAME_H__
 
 #include "core/type.hpp"
+#include "core/some.hpp"
 
 #include <string>
 
@@ -21,10 +22,15 @@ namespace gpse
       
       void setType(core::Type const& type);
       core::Type const& type() const;
+
+      void setValue(core::Some const& value);
+      core::Some const& value() const;
       
     private:
       std::string _m_name;
       core::Type _m_type;
+
+      core::Some _m_value;
     };
   }
 }

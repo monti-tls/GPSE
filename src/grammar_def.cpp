@@ -540,6 +540,51 @@ namespace gpse
         }
       );
       
+      parser.grammars()["return_statement"] = lang::Grammar(
+        [](lang::Parser* p) -> bool
+        {
+          return p->seek().which == K_RETURN;
+        },
+
+        [](lang::Parser* p) -> lang::Node*
+        {
+          lang::Token tok;
+          if (!p->eat(K_RETURN, tok))
+          {
+            return nullptr;
+          }
+          lang::Token ptok = tok;
+          lang::Node* expr = nullptr;
+          
+          core::Symbol self;
+          bool isSelf = p->scope()->layer().find("self", &self);
+          if (!isSelf || !self.isFunction())
+          {
+            p->error("return statement not in function");
+          }
+          
+          if (p->seek().which != SEMICOLON)
+          {
+            expr = p->parse("expression");
+            if (!expr)
+            {
+              return nullptr;
+            }
+          }
+          
+          if (!p->eat(SEMICOLON, tok))
+          {
+            p->error("expected `;'");
+            delete expr;
+            return nullptr;
+          }
+          
+          ReturnStatementNode* node = new ReturnStatementNode(expr);
+          node->setToken(ptok);
+          return node;
+        }
+      );
+      
       parser.grammars()["statement"] = lang::Grammar(
         [](lang::Parser* p) -> bool
         {
@@ -591,63 +636,21 @@ namespace gpse
         }
       );
       
-      parser.grammars()["return_statement"] = lang::Grammar(
-        [](lang::Parser* p) -> bool
-        {
-          return p->seek().which == K_RETURN;
-        },
-
-        [](lang::Parser* p) -> lang::Node*
-        {
-          lang::Token tok;
-          if (!p->eat(K_RETURN, tok))
-          {
-            return nullptr;
-          }
-          lang::Token ptok = tok;
-          lang::Node* expr = nullptr;
-          
-          core::Symbol self;
-          bool isSelf = p->scope()->layer().find("self", &self);
-          if (!isSelf || !self.isFunction())
-          {
-            p->error("return statement not in function");
-          }
-          
-          if (p->seek().which != SEMICOLON)
-          {
-            p->parse("expression");
-            if (!expr)
-            {
-              return nullptr;
-            }
-          }
-          
-          if (!p->eat(SEMICOLON, tok))
-          {
-            p->error("expected `;'");
-            delete expr;
-            return nullptr;
-          }
-          
-          ReturnStatementNode* node = new ReturnStatementNode(expr);
-          node->setToken(ptok);
-          return node;
-        }
-      );
-      
       parser.grammars()["function_declaration"] = lang::Grammar(
        [](lang::Parser* p) -> bool
        {
-         return p->seek().which == TYPENAME;
+         return p->seek().which == K_FUN;
        },
      
        [](lang::Parser* p) -> lang::Node*
        {
          lang::Token tok;
          
-         p->eat(TYPENAME, tok);
-         core::Type ret = tok.value.cast<core::Type>();
+         if (!p->eat(K_FUN, tok))
+         {
+           p->error("expected `fun' keyword");
+           return nullptr;
+         }
          
          if (!p->eat(IDENT, tok))
          {
@@ -657,7 +660,7 @@ namespace gpse
          lang::Token ptok = tok;
          std::string name = tok.value.cast<std::string>();
          
-         core::Prototype prototype(ret);
+         core::Prototype prototype;
          
          if (!p->eat(LPAR, tok))
          {
@@ -723,14 +726,24 @@ namespace gpse
            p->error("expected `)'");
            return nullptr;
          }
+
+         if (!p->eat(RETURNS, tok))
+         {
+          p->error("expected `~'");
+          return nullptr;
+         }
+
+         p->eat(TYPENAME, tok);
+         core::Type ret = tok.value.cast<core::Type>();
+         prototype.setRet(ret);
          
          core::Function function(name, prototype);
-         p->scope()->layer().parent()->addElement(name, function);
          FunctionDeclarationNode* node = new FunctionDeclarationNode(function);
          node->setToken(ptok);
-         
-         
-         p->scope()->down().addElement("self", function);
+
+         function.setNode(node);
+         p->scope()->layer().parent()->addElement(name, function);
+         p->scope()->layer().addElement("self", function);
          
          if (!p->eat(LCURLY, tok))
          {
@@ -758,12 +771,44 @@ namespace gpse
            return nullptr;
          }
          
+         node->setScopeLayer(&p->scope()->layer());
          p->scope()->up();
          
          return node;
        }
      );
+    
+      parser.grammars()["program"] = lang::Grammar(
+       [](lang::Parser* p) -> bool
+       {
+         return p->predicate("function_declaration") || p->predicate("statement");
+       },
+     
+       [](lang::Parser* p) -> lang::Node*
+       {
+         ProgramNode* program = new ProgramNode();
 
+         do
+          {
+            lang::Node* node = nullptr;
+
+            if (p->predicate("function_declaration"))
+              node = p->parse("function_declaration");
+            else if (p->predicate("statement"))
+              node = p->parse("statement");
+
+            if (!node)
+            {
+              delete program;
+              return nullptr;
+            }
+            
+            program->children().push_back(node);
+          } while (p->predicate("function_declaration") || p->predicate("statement"));
+
+          return program;
+       }
+      );
     }
   }
 }

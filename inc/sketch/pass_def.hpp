@@ -8,8 +8,9 @@ namespace gpse
   namespace sketch
   {
     lang::TreePass getPrinterPass();
-    lang::TreePass getLiteralReductionPass();
     lang::TreePass getTypecheckPass();
+    lang::TreePass getOptimizePass();
+    lang::TreePass getRunPass();
   }
 }
 

@@ -24,8 +24,13 @@ namespace gpse
       bool isType() const;
       bool isFunction() const;
       
+      Variable& variable();
       Variable const& variable() const;
+
+      Type& type();
       Type const& type() const;
+      
+      Function& function();
       Function const& function() const;
       
     private:
