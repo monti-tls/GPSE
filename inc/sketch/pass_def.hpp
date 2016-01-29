@@ -5,13 +5,13 @@
 
 namespace gpse
 {
-  namespace sketch
-  {
-    lang::TreePass getPrinterPass();
-    lang::TreePass getTypecheckPass();
-    lang::TreePass getOptimizePass();
-    lang::TreePass getRunPass();
-  }
+    namespace sketch
+    {
+        lang::TreePass getPrinterPass();
+        lang::TreePass getTypecheckPass();
+        lang::TreePass getOptimizePass();
+        lang::TreePass getRunPass();
+    }
 }
 
 #endif // __GPSE_SKETCH_PASS_DEF_H__

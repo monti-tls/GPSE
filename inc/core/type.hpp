@@ -3,17 +3,17 @@
 
 namespace gpse
 {
-  namespace core
-  {
-    enum class Type
+    namespace core
     {
-      Nil,
-      Integer,
-      Floating,
-      String,
-      Boolean
-    };
-  }
+        enum class Type
+        {
+            Nil,
+            Integer,
+            Floating,
+            String,
+            Boolean
+        };
+    }
 }
 
 #endif // __GPSE_CORE_TYPE_H__

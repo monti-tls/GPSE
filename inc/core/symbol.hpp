@@ -9,34 +9,34 @@
 
 namespace gpse
 {
-  namespace core
-  {
-    class Symbol
+    namespace core
     {
-    public:
-      Symbol();
-      Symbol(Variable const& variable);
-      Symbol(Type const& type);
-      Symbol(Function const& function);
-      ~Symbol();
-      
-      bool isVariable() const;
-      bool isType() const;
-      bool isFunction() const;
-      
-      Variable& variable();
-      Variable const& variable() const;
+        class Symbol
+        {
+        public:
+            Symbol();
+            Symbol(Variable const& variable);
+            Symbol(Type const& type);
+            Symbol(Function const& function);
+            ~Symbol();
 
-      Type& type();
-      Type const& type() const;
-      
-      Function& function();
-      Function const& function() const;
-      
-    private:
-      Some _m_value;
-    };
-  }
+            bool isVariable() const;
+            bool isType() const;
+            bool isFunction() const;
+
+            Variable& variable();
+            Variable const& variable() const;
+
+            Type& type();
+            Type const& type() const;
+
+            Function& function();
+            Function const& function() const;
+
+        private:
+            Some _m_value;
+        };
+    }
 }
 
 #endif // __GPSE_CORE_SYMBOL_H__

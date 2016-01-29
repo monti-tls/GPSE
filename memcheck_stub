@@ -1,3 +1,0 @@
-#!/bin/sh
-
-/usr/local/bin/valgrind --tool=memcheck --leak-check=full --dsymutil=yes bin/gpse

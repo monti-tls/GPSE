@@ -8,45 +8,45 @@
 
 namespace gpse
 {
-  namespace sketch
-  {
-    enum
+    namespace sketch
     {
-      LPAR = lang::Token::Good,
-      RPAR,
-      TIMES,
-      SLASH,
-      PLUS,
-      MINUS,
-      AND,
-      OR,
-      NOT,
-      LT,
-      LTE,
-      GT,
-      GTE,
-      EQ,
-      EQUALS,
-      SEMICOLON,
-      RETURNS,
-      COMMA,
-      LCURLY,
-      RCURLY,
-      NEQ,
-      NUMBER,
-      STRING,
-      IDENT,
-      TYPENAME,
-      VARIABLENAME,
-      FUNCTIONNAME,
-      K_TRUE,
-      K_FALSE,
-      K_RETURN,
-      K_FUN
-    };
-    
-    void setupLexer(lang::Lexer& lexer);
-  }
+        enum
+        {
+            LPAR = lang::Token::Good,
+            RPAR,
+            TIMES,
+            SLASH,
+            PLUS,
+            MINUS,
+            AND,
+            OR,
+            NOT,
+            LT,
+            LTE,
+            GT,
+            GTE,
+            EQ,
+            EQUALS,
+            SEMICOLON,
+            RETURNS,
+            COMMA,
+            LCURLY,
+            RCURLY,
+            NEQ,
+            NUMBER,
+            STRING,
+            IDENT,
+            TYPENAME,
+            VARIABLENAME,
+            FUNCTIONNAME,
+            K_TRUE,
+            K_FALSE,
+            K_RETURN,
+            K_FUN
+        };
+
+        void setupLexer(lang::Lexer& lexer);
+    }
 }
 
 #endif // __GPSE_SKETCH_RULE_DEF_H__

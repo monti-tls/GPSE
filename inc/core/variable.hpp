@@ -8,31 +8,31 @@
 
 namespace gpse
 {
-  namespace core
-  {
-    class Variable
+    namespace core
     {
-    public:
-      Variable();
-      Variable(std::string const& name, core::Type const& type);
-      ~Variable();
-      
-      void setName(std::string const& name);
-      std::string const& name() const;
-      
-      void setType(core::Type const& type);
-      core::Type const& type() const;
+        class Variable
+        {
+        public:
+            Variable();
+            Variable(std::string const& name, core::Type const& type);
+            ~Variable();
 
-      void setValue(core::Some const& value);
-      core::Some const& value() const;
-      
-    private:
-      std::string _m_name;
-      core::Type _m_type;
+            void setName(std::string const& name);
+            std::string const& name() const;
 
-      core::Some _m_value;
-    };
-  }
+            void setType(core::Type const& type);
+            core::Type const& type() const;
+
+            void setValue(core::Some const& value);
+            core::Some const& value() const;
+
+        private:
+            std::string _m_name;
+            core::Type _m_type;
+
+            core::Some _m_value;
+        };
+    }
 }
 
 #endif // __CORE_VARIABLE_NAME_H__
