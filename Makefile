@@ -12,7 +12,7 @@ BIN_DIR = bin
 # Configuration
 PRODUCT  = gpse
 DEFINES  =
-CC_FLAGS =
+CC_FLAGS = -Wno-unused-parameter
 AS_FLAGS =
 LD_FLAGS =
 

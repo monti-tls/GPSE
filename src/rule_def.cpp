@@ -44,7 +44,7 @@ namespace gpse
                 {
                     l->eat('-');
 
-                    if (l->hint() == '>')
+                    if(l->hint() == '>')
                     {
                         l->eat('>');
                         return lang::Token(RETURNS);
@@ -67,7 +67,7 @@ namespace gpse
                 {
                     l->eat('!');
 
-                    if (l->hint() == '=')
+                    if(l->hint() == '=')
                     {
                         l->eat('=');
                         return lang::Token(NEQ);
