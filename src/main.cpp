@@ -16,13 +16,14 @@
 using namespace gpse;
 
 /* TODO-list :
- *   - properly reformat code (w/ 4*spaces tabs)
  *   - separate source directory into core/lang/sketch dirs
  *   - update build system with proper Makefile
- *   - clean up repo from shitty project files (and setup a better gitignore)
  *
  *   - implement conditionals
  *   - cleanup arithmetics (to handle auto casts)
+ *   - handle errors better :
+ *     - no more silent errors due to nullptrs returned upon AST building
+ *     - throw exception on parser / typecheck / other pass error
  */
 
 int main()

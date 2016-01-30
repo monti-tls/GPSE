@@ -26,16 +26,58 @@ namespace gpse
             lexer.rules().push_back(lang::Rule::single(TIMES, '*'));
             lexer.rules().push_back(lang::Rule::single(SLASH, '/'));
             lexer.rules().push_back(lang::Rule::single(PLUS, '+'));
-            lexer.rules().push_back(lang::Rule::single(MINUS, '-'));
             lexer.rules().push_back(lang::Rule::single(AND, "&&"));
             lexer.rules().push_back(lang::Rule::single(OR, "||"));
-            lexer.rules().push_back(lang::Rule::single(NOT, '!'));
             lexer.rules().push_back(lang::Rule::single(SEMICOLON, ';'));
             lexer.rules().push_back(lang::Rule::single(COMMA, ','));
             lexer.rules().push_back(lang::Rule::single(LCURLY, '{'));
             lexer.rules().push_back(lang::Rule::single(RCURLY, '}'));
-            lexer.rules().push_back(lang::Rule::single(RETURNS, '~'));
-            lexer.rules().push_back(lang::Rule::single(NEQ, "!="));
+
+            // MINUS / RETURNS
+            {
+                auto pred = [](int h) -> bool
+                {
+                    return h == '-';
+                };
+
+                auto rule = [](lang::Lexer* l) -> lang::Token
+                {
+                    l->eat('-');
+
+                    if (l->hint() == '>')
+                    {
+                        l->eat('>');
+                        return lang::Token(RETURNS);
+                    }
+
+                    return lang::Token(MINUS);
+                };
+
+                lexer.rules().push_back(lang::Rule(pred, rule));
+            }
+
+            // NEQ / NOT
+            {
+                auto pred = [](int h) -> bool
+                {
+                    return h == '!';
+                };
+
+                auto rule = [](lang::Lexer* l) -> lang::Token
+                {
+                    l->eat('!');
+
+                    if (l->hint() == '=')
+                    {
+                        l->eat('=');
+                        return lang::Token(NEQ);
+                    }
+
+                    return lang::Token(NOT);
+                };
+
+                lexer.rules().push_back(lang::Rule(pred, rule));
+            }
 
             // LT / LTE
             {

@@ -115,6 +115,7 @@ namespace gpse
                             if(!p->eat(RPAR, tok))
                             {
                                 p->error("expected `)'");
+                                return nullptr;
                             }
                             return expr;
                         }
@@ -750,7 +751,7 @@ namespace gpse
 
                     if(!p->eat(RETURNS, tok))
                     {
-                        p->error("expected `~'");
+                        p->error("expected `->'");
                         return nullptr;
                     }
 

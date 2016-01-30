@@ -1,5 +1,8 @@
 #include "lang/lexer.hpp"
 
+#include <sstream>
+#include <stdexcept>
+
 using namespace gpse;
 using namespace lang;
 
@@ -106,14 +109,21 @@ void Lexer::skipWs()
 
 void Lexer::error(Token const& tok, std::string const& message) const
 {
-    std::cerr << "line " << tok.debug.line << ", col " << tok.debug.col << ": error: " << message << std::endl;
-    std::cerr << "    " << _M_wholeLine(tok) << std::endl;
-    std::cerr << "    ";
+    std::ostringstream ss;
+
+    ss << "line " << tok.debug.line << ", col " << tok.debug.col << ": error: " << message << std::endl;
+    ss << "    " << _M_wholeLine(tok) << std::endl;
+    ss << "    ";
     for(int i = 1; i < tok.debug.col; ++i)
     {
-        std::cerr << " ";
+        ss << " ";
     }
-    std::cerr << "^" << std::endl;
+    ss << "^";
+
+    std::string err = ss.str();
+
+    std::cerr << err << std::endl;
+    throw std::runtime_error(err);
 }
 
 Token Lexer::token()
