@@ -21,6 +21,7 @@ namespace gpse
         public:
             Prototype();
             Prototype(Type const& ret, std::vector<Variable> const& args = std::vector<Variable>());
+            Prototype(Type const& ret, std::vector<Type> const& args_types = std::vector<Type>());
             ~Prototype();
 
             Type const& ret() const;

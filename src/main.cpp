@@ -4,7 +4,9 @@
 #include "sketch/grammar_def.hpp"
 #include "sketch/ast.hpp"
 #include "sketch/pass_def.hpp"
+#include "sketch/runtime_def.hpp"
 #include "core/scope.hpp"
+#include "core/callback.hpp"
 
 #include <iostream>
 #include <string>
@@ -12,6 +14,9 @@
 #include <fstream>
 #include <map>
 #include <stack>
+#include <vector>
+#include <tuple>
+#include <cmath>
 
 using namespace gpse;
 
@@ -26,12 +31,33 @@ using namespace gpse;
  *     - throw exception on parser / typecheck / other pass error
  */
 
+void print_i(float value)
+{
+    std::cout << "print_i(" << value << ")" << std::endl;
+}
+
+void print_f(float value)
+{
+    std::cout << "print_f(" << value << ")" << std::endl;
+}
+
+float mypow(float a, float b)
+{
+    return std::pow(a, b);
+}
+
 int main()
 {
     // std::istringstream ss(str);
     std::ifstream ss("src/sample.sketch");
 
     core::Scope* scope = new core::Scope();
+    sketch::setupScope(scope);
+
+    scope->layer().addElement("printi", core::Callback(std::function<void(int)>(&print_i), "print_i"));
+    scope->layer().addElement("printf", core::Callback(std::function<void(float)>(&print_f), "print_f"));
+    scope->layer().addElement("pow", core::Callback(std::function<float(float, float)>(&mypow), "pow"));
+
     lang::Lexer lexer(ss, scope);
     sketch::setupLexer(lexer);
 
@@ -51,15 +77,15 @@ int main()
     std::cout << "Parser output :" << std::endl;
     print.pass(root);
 
-    optimize.pass(root);
+    /*optimize.pass(root);
 
     std::cout << "After optimization pass :" << std::endl;
-    print.pass(root);
+    print.pass(root);*/
 
     std::cout << "** Running program **" << std::endl;
     run.pass(root);
 
-    std::cout << scope->layer().findRef("foo")->variable().value().cast<int>() << std::endl;
+    // std::cout << scope->layer().findRef("foo")->variable().value().cast<int>() << std::endl;
 
     delete root;
     delete scope;

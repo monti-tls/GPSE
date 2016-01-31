@@ -11,7 +11,8 @@ namespace gpse
             Integer,
             Floating,
             String,
-            Boolean
+            Boolean,
+            Opaque
         };
     }
 }

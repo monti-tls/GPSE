@@ -39,6 +39,7 @@ namespace gpse
             TYPENAME,
             VARIABLENAME,
             FUNCTIONNAME,
+            CALLBACKNAME,
             K_TRUE,
             K_FALSE,
             K_RETURN,

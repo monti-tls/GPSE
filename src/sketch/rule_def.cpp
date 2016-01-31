@@ -8,12 +8,6 @@ namespace gpse
     {
         void setupLexer(lang::Lexer& lexer)
         {
-            lexer.scope()->layer().addElement("nil", core::Symbol(core::Type::Nil));
-            lexer.scope()->layer().addElement("int", core::Symbol(core::Type::Integer));
-            lexer.scope()->layer().addElement("float", core::Symbol(core::Type::Floating));
-            lexer.scope()->layer().addElement("string", core::Symbol(core::Type::String));
-            lexer.scope()->layer().addElement("bool", core::Symbol(core::Type::Boolean));
-
             lexer.rules().clear();
 
             lexer.wsRule() = [](int h) -> bool
@@ -32,6 +26,12 @@ namespace gpse
             lexer.rules().push_back(lang::Rule::single(COMMA, ','));
             lexer.rules().push_back(lang::Rule::single(LCURLY, '{'));
             lexer.rules().push_back(lang::Rule::single(RCURLY, '}'));
+
+            std::map<std::string, int> keywords;
+            keywords["true"] = K_TRUE;
+            keywords["false"] = K_FALSE;
+            keywords["return"] = K_RETURN;
+            keywords["fun"] = K_FUN;
 
             // MINUS / RETURNS
             {
@@ -189,14 +189,14 @@ namespace gpse
                 lexer.rules().push_back(lang::Rule(pred, rule));
             }
 
-            // IDENT, VARIABLENAME, FUNCTIONNAME, TYPENAME and K_*
+            // IDENT, VARIABLENAME, FUNCTIONNAME, CALLBACKNAME, TYPENAME and K_*
             {
                 auto pred = [](int h) -> bool
                 {
                     return std::isalpha(h) || h == '_';
                 };
 
-                auto rule = [](lang::Lexer* l) -> lang::Token
+                auto rule = [keywords](lang::Lexer* l) -> lang::Token
                 {
                     std::string temp;
 
@@ -209,12 +209,6 @@ namespace gpse
                     {
                         temp += l->get();
                     }
-
-                    std::map<std::string, int> keywords;
-                    keywords["true"] = K_TRUE;
-                    keywords["false"] = K_FALSE;
-                    keywords["return"] = K_RETURN;
-                    keywords["fun"] = K_FUN;
                     auto kw_it = keywords.find(temp);
 
                     // if the identifier is a valid keyword
@@ -239,6 +233,10 @@ namespace gpse
                             else if(sym.isFunction())
                             {
                                 return lang::Token(FUNCTIONNAME, sym.function());
+                            }
+                            else if(sym.isCallback())
+                            {
+                                return lang::Token(CALLBACKNAME, sym.callback());
                             }
                         }
                     }

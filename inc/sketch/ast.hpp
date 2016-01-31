@@ -17,6 +17,7 @@ namespace gpse
             EXPRESSION_NODE,
             VARIABLE_NODE,
             FUNCTION_CALL_NODE,
+            CALLBACK_CALL_NODE,
             CAST_NODE,
             VARIABLE_DECL_NODE,
             VARIABLE_ASSIGN_NODE,
@@ -60,6 +61,18 @@ namespace gpse
 
         private:
             core::Function _m_value;
+        };
+
+        class CallbackCallNode : public lang::Node
+        {
+        public:
+            CallbackCallNode(core::Callback const& value, lang::Node* parent = nullptr);
+            ~CallbackCallNode();
+
+            core::Callback const& value() const;
+
+        private:
+            core::Callback _m_value;
         };
 
         class CastNode : public lang::Node

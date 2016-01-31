@@ -3,4 +3,5 @@ fun double(int a) -> int
 	return (1 + 1) * a;
 }
 
-int foo = 3 * double(2);
+printi(3);
+printf(pow(3.0, 4.0));

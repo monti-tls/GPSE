@@ -15,6 +15,15 @@ Prototype::Prototype(Type const& ret, std::vector<Variable> const& args)
 {
 }
 
+Prototype::Prototype(Type const& ret, std::vector<Type> const& args_types)
+    : _m_ret(ret)
+{
+    for(auto& tp : args_types)
+    {
+        _m_args.push_back(core::Variable("_", tp));
+    }
+}
+
 Prototype::~Prototype()
 {
 }

@@ -14,7 +14,7 @@ namespace gpse
             {
                 auto pred = [](lang::Parser* p) -> bool
                 {
-                    return p->seek().which == VARIABLENAME || p->seek().which == FUNCTIONNAME || p->seek().which == NUMBER;
+                    return p->seek().which == VARIABLENAME || p->seek().which == FUNCTIONNAME || p->seek().which == CALLBACKNAME || p->seek().which == NUMBER;
                 };
 
                 auto rule = [](lang::Parser * p) -> lang::Node *
@@ -85,6 +85,52 @@ namespace gpse
                             return nullptr;
                         }
 
+                        node->setToken(tok);
+                        return node;
+                    }
+                    else if(p->seek().which == CALLBACKNAME)
+                    {
+                        p->eat(CALLBACKNAME, tok);
+                        lang::Token ptok = tok;
+
+                        core::Callback callback = tok.value.cast<core::Callback>();
+                        CallbackCallNode* node = new CallbackCallNode(callback);
+
+                        if(!p->eat(LPAR, tok))
+                        {
+                            p->error("expected `)'");
+                            delete node;
+                            return nullptr;
+                        }
+
+                        if(p->seek().which != RPAR)
+                        {
+                            do
+                            {
+                                if(p->seek() == COMMA)
+                                {
+                                    p->eat(COMMA, tok);
+                                }
+
+                                lang::Node* arg = p->parse("expression");
+                                if(!arg)
+                                {
+                                    delete node;
+                                    return nullptr;
+                                }
+
+                                node->addChild(arg);
+                            } while(p->seek() == COMMA);
+                        }
+
+                        if(!p->eat(RPAR, tok))
+                        {
+                            p->error("expected `)'");
+                            delete node;
+                            return nullptr;
+                        }
+
+                        node->setToken(tok);
                         return node;
                     }
                     else if(p->seek().which == LPAR)
@@ -610,6 +656,7 @@ namespace gpse
                 {
                     return p->predicate("variable_declaration") || p->predicate("variable_assign") || p->predicate("return_statement");
                 };
+
                 auto rule = [](lang::Parser * p) -> lang::Node *
                 {
                     if(p->predicate("variable_assign"))
@@ -620,7 +667,7 @@ namespace gpse
                     {
                         return p->parse("variable_declaration");
                     }
-                    else // if (p->predicate("return_statement"))
+                    else // if(p->predicate("return_statement"))
                     {
                         return p->parse("return_statement");
                     }
@@ -820,6 +867,19 @@ namespace gpse
                             node = p->parse("function_declaration");
                         else if(p->predicate("statement"))
                             node = p->parse("statement");
+                        else
+                        {
+                            node = p->parse("expression");
+
+                            lang::Token tok;
+                            if (!p->eat(SEMICOLON, tok))
+                            {
+                                p->error("expected `;'");
+
+                                delete program;
+                                return nullptr;
+                            }
+                        }
 
                         if(!node)
                         {
@@ -828,7 +888,7 @@ namespace gpse
                         }
 
                         program->children().push_back(node);
-                    } while(p->predicate("function_declaration") || p->predicate("statement"));
+                    } while(p->seek().which != lang::Token::Eof);
 
                     return program;
                 };

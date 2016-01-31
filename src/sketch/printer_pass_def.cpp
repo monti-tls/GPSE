@@ -96,6 +96,35 @@ namespace gpse
                 pass.addOperator<FUNCTION_CALL_NODE, FunctionCallNode>(rule);
             }
 
+            //// CallbackCallNode ////
+            {
+                auto rule = [](lang::TreePass* pass, lang::Node*& node, CallbackCallNode* call)
+                {
+                    for(int i = 0; i < indent; ++i)
+                    {
+                        std::cout << "  ";
+                    }
+
+                    std::cout << "[callback: " << call->value().name() << std::endl;
+
+                    ++indent;
+                    for(lang::Node*& child : call->children())
+                    {
+                        pass->pass(child);
+                    }
+                    --indent;
+
+                    for(int i = 0; i < indent; ++i)
+                    {
+                        std::cout << "  ";
+                    }
+
+                    std::cout << "]" << std::endl;
+                };
+
+                pass.addOperator<CALLBACK_CALL_NODE, CallbackCallNode>(rule);
+            }
+
             //// CastNode ////
             {
                 auto rule = [](lang::TreePass* pass, lang::Node*& node, CastNode* cast)

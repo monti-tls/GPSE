@@ -48,6 +48,21 @@ core::Function const& FunctionCallNode::value() const
     return _m_value;
 }
 
+CallbackCallNode::CallbackCallNode(core::Callback const& value, lang::Node* parent)
+    : Node(CALLBACK_CALL_NODE, parent)
+    , _m_value(value)
+{
+}
+
+CallbackCallNode::~CallbackCallNode()
+{
+}
+
+core::Callback const& CallbackCallNode::value() const
+{
+    return _m_value;
+}
+
 CastNode::CastNode(core::Type const& to, lang::Node* expr, lang::Node* parent)
     : Node(CAST_NODE, parent)
     , _m_to(to)

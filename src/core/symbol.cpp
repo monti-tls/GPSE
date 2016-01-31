@@ -23,6 +23,11 @@ Symbol::Symbol(Function const& function)
 {
 }
 
+Symbol::Symbol(Callback const& callback)
+    : _m_value(callback)
+{
+}
+
 Symbol::~Symbol()
 {
 }
@@ -40,6 +45,11 @@ bool Symbol::isType() const
 bool Symbol::isFunction() const
 {
     return _m_value.is<Function>();
+}
+
+bool Symbol::isCallback() const
+{
+    return _m_value.is<Callback>();
 }
 
 Variable& Symbol::variable()
@@ -70,4 +80,14 @@ Function& Symbol::function()
 Function const& Symbol::function() const
 {
     return _m_value.cast<Function>();
+}
+
+Callback& Symbol::callback()
+{
+    return _m_value.cast<Callback>();
+}
+
+Callback const& Symbol::callback() const
+{
+    return _m_value.cast<Callback>();
 }
