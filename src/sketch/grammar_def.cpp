@@ -38,63 +38,31 @@ namespace gpse
                     else if(p->seek().which == VARIABLENAME)
                     {
                         p->eat(VARIABLENAME, tok);
-                        core::Variable variable = tok.value.cast<core::Variable>();
+                        core::Variable variable = tok.value.as<core::Variable>();
                         VariableNode* node = new VariableNode(variable);
                         node->setToken(tok);
                         return node;
                     }
-                    else if(p->seek().which == FUNCTIONNAME)
+                    else if(p->seek().which == FUNCTIONNAME || p->seek().which == CALLBACKNAME)
                     {
-                        p->eat(FUNCTIONNAME, tok);
-                        lang::Token ptok = tok;
+                        lang::Node* node = nullptr;
 
-                        core::Function function = tok.value.cast<core::Function>();
-                        FunctionCallNode* node = new FunctionCallNode(function);
-
-                        if(!p->eat(LPAR, tok))
+                        if(p->seek().which == FUNCTIONNAME)
                         {
-                            p->error("expected `)'");
-                            delete node;
-                            return nullptr;
-                        }
+                            p->eat(FUNCTIONNAME, tok);
+                            lang::Token ptok = tok;
 
-                        if(p->seek().which != RPAR)
+                            core::Function function = tok.value.as<core::Function>();
+                            node = new FunctionCallNode(function);
+                        }
+                        else if(p->seek().which == CALLBACKNAME)
                         {
-                            do
-                            {
-                                if(p->seek() == COMMA)
-                                {
-                                    p->eat(COMMA, tok);
-                                }
+                            p->eat(CALLBACKNAME, tok);
+                            lang::Token ptok = tok;
 
-                                lang::Node* arg = p->parse("expression");
-                                if(!arg)
-                                {
-                                    delete node;
-                                    return nullptr;
-                                }
-
-                                node->addChild(arg);
-                            } while(p->seek() == COMMA);
+                            core::Callback callback = tok.value.as<core::Callback>();
+                            node = new CallbackCallNode(callback);
                         }
-
-                        if(!p->eat(RPAR, tok))
-                        {
-                            p->error("expected `)'");
-                            delete node;
-                            return nullptr;
-                        }
-
-                        node->setToken(tok);
-                        return node;
-                    }
-                    else if(p->seek().which == CALLBACKNAME)
-                    {
-                        p->eat(CALLBACKNAME, tok);
-                        lang::Token ptok = tok;
-
-                        core::Callback callback = tok.value.cast<core::Callback>();
-                        CallbackCallNode* node = new CallbackCallNode(callback);
 
                         if(!p->eat(LPAR, tok))
                         {
@@ -151,7 +119,7 @@ namespace gpse
                             {
                                 return nullptr;
                             }
-                            CastNode* node = new CastNode(ptok.value.cast<core::Type>(), expr);
+                            CastNode* node = new CastNode(ptok.value.as<core::Type>(), expr);
                             node->setToken(ptok);
                             return node;
                         }
@@ -168,7 +136,7 @@ namespace gpse
                     }
                     else if(p->seek().which == IDENT)
                     {
-                        p->error("invalid use of undeclared identifier `" + p->seek().value.cast<std::string>() + "'");
+                        p->error("invalid use of undeclared identifier `" + p->seek().value.as<std::string>() + "'");
                         return nullptr;
                     }
                     else if(p->seek().which == K_TRUE)
@@ -498,7 +466,7 @@ namespace gpse
                         return nullptr;
                     }
 
-                    core::Type type = tok.value.cast<core::Type>();
+                    core::Type type = tok.value.as<core::Type>();
 
                     if(!p->eat(IDENT, tok))
                     {
@@ -508,12 +476,12 @@ namespace gpse
                         }
                         else
                         {
-                            p->error("`" + tok.value.cast<std::string>() + "' is already declared");
+                            p->error("`" + tok.value.as<std::string>() + "' is already declared");
                         }
                         return nullptr;
                     }
 
-                    std::string name = tok.value.cast<std::string>();
+                    std::string name = tok.value.as<std::string>();
 
                     if(p->scope()->layer().findInScope(name))
                     {
@@ -571,7 +539,7 @@ namespace gpse
                         p->error("expected variable identifier");
                         return nullptr;
                     }
-                    core::Variable variable = tok.value.cast<core::Variable>();
+                    core::Variable variable = tok.value.as<core::Variable>();
 
                     if(!p->eat(EQUALS, tok))
                     {
@@ -728,7 +696,7 @@ namespace gpse
                         return nullptr;
                     }
                     lang::Token ptok = tok;
-                    std::string name = tok.value.cast<std::string>();
+                    std::string name = tok.value.as<std::string>();
 
                     core::Prototype prototype;
 
@@ -754,18 +722,18 @@ namespace gpse
                                 p->error("expected typename");
                                 return nullptr;
                             }
-                            core::Type type = tok.value.cast<core::Type>();
+                            core::Type type = tok.value.as<core::Type>();
 
                             std::string name;
                             if(p->seek().which == IDENT)
                             {
                                 p->eat(IDENT, tok);
-                                name = tok.value.cast<std::string>();
+                                name = tok.value.as<std::string>();
                             }
                             else if(p->seek().which == VARIABLENAME)
                             {
                                 p->eat(VARIABLENAME, tok);
-                                name = tok.value.cast<core::Variable>().name();
+                                name = tok.value.as<core::Variable>().name();
 
                                 if(p->scope()->layer().findInScope(name))
                                 {
@@ -776,7 +744,7 @@ namespace gpse
                             else if(p->seek().which == FUNCTIONNAME)
                             {
                                 p->eat(FUNCTIONNAME, tok);
-                                name = tok.value.cast<core::Function>().name();
+                                name = tok.value.as<core::Function>().name();
                             }
                             else
                             {
@@ -803,7 +771,7 @@ namespace gpse
                     }
 
                     p->eat(TYPENAME, tok);
-                    core::Type ret = tok.value.cast<core::Type>();
+                    core::Type ret = tok.value.as<core::Type>();
                     prototype.setRet(ret);
 
                     core::Function function(name, prototype);
@@ -872,7 +840,7 @@ namespace gpse
                             node = p->parse("expression");
 
                             lang::Token tok;
-                            if (!p->eat(SEMICOLON, tok))
+                            if(!p->eat(SEMICOLON, tok))
                             {
                                 p->error("expected `;'");
 

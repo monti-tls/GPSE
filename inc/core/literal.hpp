@@ -14,7 +14,7 @@ namespace gpse
         {
         public:
             Literal();
-            Literal(core::Some const& value);
+            Literal(Some const& value);
             Literal(bool boolean);
             Literal(int integer);
             Literal(float floating);
@@ -26,7 +26,7 @@ namespace gpse
             Literal& operator=(float floating);
             Literal& operator=(std::string const& string);
 
-            core::Type type() const;
+            Type type() const;
             bool is(core::Type const& type) const;
             bool isNil() const;
             bool isBoolean() const;
@@ -34,7 +34,8 @@ namespace gpse
             bool isFloating() const;
             bool isString() const;
 
-            core::Some const& value() const;
+            Some const& value() const;
+            Some cast(core::Type const& type) const;
             bool boolean() const;
             int integer() const;
             float floating() const;
@@ -57,7 +58,7 @@ namespace gpse
             Literal operator!=(Literal const& rhs) const;
 
         private:
-            core::Some _m_value;
+            Some _m_value;
         };
     }
 }

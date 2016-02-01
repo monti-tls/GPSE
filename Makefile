@@ -8,6 +8,7 @@ SRC_DIR = src
 INC_DIR = inc
 TMP_DIR = obj
 BIN_DIR = bin
+DOX_DIR = doxygen
 
 # Configuration
 PRODUCT  = gpse
@@ -45,9 +46,13 @@ all: gpse
 
 gpse: $(BINARY)
 
+.PHONY: doxygen
+doxygen:
+	@doxygen Doxyfile
+
 .PHONY: clean
 clean:
-	@rm -rf $(BIN_DIR) $(TMP_DIR)
+	@rm -rf $(BIN_DIR) $(TMP_DIR) $(DOX_DIR)
 
 .PHONY: format
 format: $(C_FMT) $(H_FMT)

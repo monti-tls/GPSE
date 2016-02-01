@@ -13,6 +13,7 @@ namespace gpse
             scope->layer().addElement("float", core::Symbol(core::Type::Floating));
             scope->layer().addElement("string", core::Symbol(core::Type::String));
             scope->layer().addElement("bool", core::Symbol(core::Type::Boolean));
+            scope->layer().addElement("opaque", core::Symbol(core::Type::Opaque));
         }
     }
 }

@@ -5,3 +5,7 @@ fun double(int a) -> int
 
 printi(3);
 printf(pow(3.0, 4.0));
+printi(((int) "123") + 321);
+
+opaque v = create_vec();
+print_vec(v);

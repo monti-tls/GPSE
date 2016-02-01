@@ -82,6 +82,11 @@ namespace gpse
                 return !_m_data;
             }
 
+            bool valid() const
+            {
+                return _m_data;
+            }
+
             template <typename T>
             bool is() const
             {
@@ -97,13 +102,13 @@ namespace gpse
             }
 
             template <typename T>
-            T& cast()
+            T& as()
             {
                 return dynamic_cast<Data<T>&>(*_m_data).get();
             }
 
             template <typename T>
-            T const& cast() const
+            T const& as() const
             {
                 return dynamic_cast<Data<T>&>(*_m_data).get();
             }

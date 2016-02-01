@@ -31,7 +31,7 @@ using namespace gpse;
  *     - throw exception on parser / typecheck / other pass error
  */
 
-void print_i(float value)
+void print_i(int value)
 {
     std::cout << "print_i(" << value << ")" << std::endl;
 }
@@ -46,17 +46,30 @@ float mypow(float a, float b)
     return std::pow(a, b);
 }
 
+std::vector<int>* create_vec()
+{
+    return new std::vector<int>({1, 2, 3, 4});
+}
+
+void print_vec(std::vector<int>* vec)
+{
+    for(auto i : *vec) std::cout << i << " ";
+    std::cout << std::endl;
+}
+
 int main()
 {
-    // std::istringstream ss(str);
     std::ifstream ss("src/sample.sketch");
 
     core::Scope* scope = new core::Scope();
     sketch::setupScope(scope);
 
-    scope->layer().addElement("printi", core::Callback(std::function<void(int)>(&print_i), "print_i"));
-    scope->layer().addElement("printf", core::Callback(std::function<void(float)>(&print_f), "print_f"));
-    scope->layer().addElement("pow", core::Callback(std::function<float(float, float)>(&mypow), "pow"));
+    sketch::expose(scope, "printi", &print_i);
+    sketch::expose(scope, "printf", &print_f);
+    sketch::expose(scope, "pow", &mypow);
+
+    sketch::expose(scope, "create_vec", &create_vec);
+    sketch::expose(scope, "print_vec", &print_vec);
 
     lang::Lexer lexer(ss, scope);
     sketch::setupLexer(lexer);
@@ -85,7 +98,7 @@ int main()
     std::cout << "** Running program **" << std::endl;
     run.pass(root);
 
-    // std::cout << scope->layer().findRef("foo")->variable().value().cast<int>() << std::endl;
+    // std::cout << scope->layer().findRef("foo")->variable().value().as<int>() << std::endl;
 
     delete root;
     delete scope;

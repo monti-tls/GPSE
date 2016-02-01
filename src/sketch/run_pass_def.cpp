@@ -97,15 +97,12 @@ namespace gpse
             {
                 auto rule = [&](lang::TreePass* pass, lang::Node*& node, CastNode* cast)
                 {
-                    /*for (int i = 0; i < indent; ++i)
-                    {
-                      std::cout << "  ";
-                    }
+                    pass->pass(node->children()[0]);
+                    core::Literal value = pass->storage();
 
-                    std::cout << "[cast]" << std::endl;
-                    ++indent;
-                    pass->pass(cast->children()[0]);
-                    --indent;*/
+                    if(cast->to() == core::Type::Opaque || cast->to() == core::Type::Nil) node->error("invalid cast");
+
+                    pass->storage() = value.cast(cast->to());
                 };
 
                 pass.addOperator<CAST_NODE, CastNode>(rule);
@@ -118,24 +115,18 @@ namespace gpse
                     if(expression->isUnary())
                     {
                         pass->pass(expression->children()[0]);
-                        core::Some value = pass->storage(); // stack_pop(pass);
+                        core::Literal value = pass->storage();
                         core::Some result;
 
                         if(expression->unaryOperation() == ExpressionNode::Unary::Neg)
                         {
-                            if(value.is<int>())
-                                result = -value.cast<int>();
-                            else if(value.is<float>())
-                                result = -value.cast<float>();
-                            else
-                                node->error("negating something not a number");
+                            result = (-value).value();
+                            if(!result.valid()) node->error("negating something not a number");
                         }
                         else if(expression->unaryOperation() == ExpressionNode::Unary::Not)
                         {
-                            if(value.is<bool>())
-                                result = !value.cast<bool>();
-                            else
-                                node->error("not'ing something not a boolean");
+                            result = (!value).value();
+                            if(!result.valid()) node->error("not'ing something not a boolean");
                         }
 
                         pass->storage() = result;
@@ -143,115 +134,73 @@ namespace gpse
                     else if(expression->isBinary())
                     {
                         pass->pass(expression->children()[0]);
-                        core::Some lhs = pass->storage();
+                        core::Literal lhs = pass->storage();
 
                         pass->pass(expression->children()[1]);
-                        core::Some rhs = pass->storage();
+                        core::Literal rhs = pass->storage();
 
                         core::Some result;
 
                         switch(expression->binaryOperation())
                         {
                             case ExpressionNode::Binary::Add:
-                                if(lhs.is<int>())
-                                    result = lhs.cast<int>() + rhs.cast<int>();
-                                else if(lhs.is<float>())
-                                    result = lhs.cast<float>() + rhs.cast<float>();
+                                result = (lhs + rhs).value();
+                                if(!result.valid()) node->error("not adding numbers");
                                 break;
 
                             case ExpressionNode::Binary::Sub:
-                                if(lhs.is<int>())
-                                    result = lhs.cast<int>() - rhs.cast<int>();
-                                else if(lhs.is<float>())
-                                    result = lhs.cast<float>() - rhs.cast<float>();
-                                else
-                                    node->error("adding something not a number");
+                                result = (lhs - rhs).value();
+                                if(!result.valid()) node->error("not subtracting numbers");
                                 break;
 
                             case ExpressionNode::Binary::Mul:
-                                if(lhs.is<int>())
-                                    result = lhs.cast<int>() * rhs.cast<int>();
-                                else if(lhs.is<float>())
-                                    result = lhs.cast<float>() * rhs.cast<float>();
-                                else
-                                    node->error("multiplying something not a number");
+                                result = (lhs * rhs).value();
+                                if(!result.valid()) node->error("not adding numbers");
                                 break;
 
                             case ExpressionNode::Binary::Div:
-                                if(lhs.is<int>())
-                                    result = lhs.cast<int>() / rhs.cast<int>();
-                                else if(lhs.is<float>())
-                                    result = lhs.cast<float>() / rhs.cast<float>();
-                                else
-                                    node->error("dividing something not a number");
+                                result = (lhs / rhs).value();
+                                if(!result.valid()) node->error("not dividing numbers");
                                 break;
 
                             case ExpressionNode::Binary::Lt:
-                                if(lhs.is<int>())
-                                    result = lhs.cast<int>() < rhs.cast<int>();
-                                else if(lhs.is<float>())
-                                    result = lhs.cast<float>() < rhs.cast<float>();
-                                else
-                                    node->error("lt'ing something not a number");
+                                result = (lhs < rhs).value();
+                                if(!result.valid()) node->error("not comparing numbers");
                                 break;
 
                             case ExpressionNode::Binary::Lte:
-                                if(lhs.is<int>())
-                                    result = lhs.cast<int>() <= rhs.cast<int>();
-                                else if(lhs.is<float>())
-                                    result = lhs.cast<float>() <= rhs.cast<float>();
-                                else
-                                    node->error("lte'ing something not a number");
+                                result = (lhs <= rhs).value();
+                                if(!result.valid()) node->error("not comparing numbers");
                                 break;
 
                             case ExpressionNode::Binary::Gt:
-                                if(lhs.is<int>())
-                                    result = lhs.cast<int>() > rhs.cast<int>();
-                                else if(lhs.is<float>())
-                                    result = lhs.cast<float>() > rhs.cast<float>();
-                                else
-                                    node->error("gt'ing something not a number");
+                                result = (lhs > rhs).value();
+                                if(!result.valid()) node->error("not comparing numbers");
                                 break;
 
                             case ExpressionNode::Binary::Gte:
-                                if(lhs.is<int>())
-                                    result = lhs.cast<int>() >= rhs.cast<int>();
-                                else if(lhs.is<float>())
-                                    result = lhs.cast<float>() >= rhs.cast<float>();
-                                else
-                                    node->error("gte'ing something not a number");
+                                result = (lhs >= rhs).value();
+                                if(!result.valid()) node->error("not comparing numbers");
                                 break;
 
                             case ExpressionNode::Binary::Eq:
-                                if(lhs.is<int>())
-                                    result = lhs.cast<int>() == rhs.cast<int>();
-                                else if(lhs.is<float>())
-                                    result = lhs.cast<float>() == rhs.cast<float>();
-                                else
-                                    node->error("eq'ing something not a number");
+                                result = (lhs == rhs).value();
+                                if(!result.valid()) node->error("not comparing numbers");
                                 break;
 
                             case ExpressionNode::Binary::Neq:
-                                if(lhs.is<int>())
-                                    result = lhs.cast<int>() != rhs.cast<int>();
-                                else if(lhs.is<float>())
-                                    result = lhs.cast<float>() != rhs.cast<float>();
-                                else
-                                    node->error("neq'ing something not a number");
+                                result = (lhs != rhs).value();
+                                if(!result.valid()) node->error("not comparing numbers");
                                 break;
 
                             case ExpressionNode::Binary::And:
-                                if(lhs.is<bool>())
-                                    result = lhs.cast<bool>() && rhs.cast<bool>();
-                                else
-                                    node->error("and'ing something not a boolean");
+                                result = (lhs && rhs).value();
+                                if(!result.valid()) node->error("not and'ing booleans");
                                 break;
 
                             case ExpressionNode::Binary::Or:
-                                if(lhs.is<bool>())
-                                    result = lhs.cast<bool>() || rhs.cast<bool>();
-                                else
-                                    node->error("or'ing something not a boolean");
+                                result = (lhs || rhs).value();
+                                if(!result.valid()) node->error("not or'ing booleans");
                                 break;
                         }
 

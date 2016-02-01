@@ -54,40 +54,40 @@ bool Symbol::isCallback() const
 
 Variable& Symbol::variable()
 {
-    return _m_value.cast<Variable>();
+    return _m_value.as<Variable>();
 }
 
 Variable const& Symbol::variable() const
 {
-    return _m_value.cast<Variable>();
+    return _m_value.as<Variable>();
 }
 
 Type& Symbol::type()
 {
-    return _m_value.cast<Type>();
+    return _m_value.as<Type>();
 }
 
 Type const& Symbol::type() const
 {
-    return _m_value.cast<Type>();
+    return _m_value.as<Type>();
 }
 
 Function& Symbol::function()
 {
-    return _m_value.cast<Function>();
+    return _m_value.as<Function>();
 }
 
 Function const& Symbol::function() const
 {
-    return _m_value.cast<Function>();
+    return _m_value.as<Function>();
 }
 
 Callback& Symbol::callback()
 {
-    return _m_value.cast<Callback>();
+    return _m_value.as<Callback>();
 }
 
 Callback const& Symbol::callback() const
 {
-    return _m_value.cast<Callback>();
+    return _m_value.as<Callback>();
 }

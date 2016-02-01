@@ -9,7 +9,7 @@ Literal::Literal()
 {
 }
 
-Literal::Literal(core::Some const& value)
+Literal::Literal(Some const& value)
     : _m_value(value)
 {
 }
@@ -62,26 +62,26 @@ Literal& Literal::operator=(std::string const& string)
     return *this;
 }
 
-core::Type Literal::type() const
+Type Literal::type() const
 {
     if(isInteger())
     {
-        return core::Type::Integer;
+        return Type::Integer;
     }
     else if(isFloating())
     {
-        return core::Type::Floating;
+        return Type::Floating;
     }
     else if(isString())
     {
-        return core::Type::String;
+        return Type::String;
     }
     else if(isBoolean())
     {
-        return core::Type::Boolean;
+        return Type::Boolean;
     }
 
-    return core::Type::Nil;
+    return Type::Nil;
 }
 
 bool Literal::isNil() const
@@ -109,9 +109,30 @@ bool Literal::isString() const
     return _m_value.is<std::string>();
 }
 
-core::Some const& Literal::value() const
+Some const& Literal::value() const
 {
     return _m_value;
+}
+
+Some Literal::cast(Type const& type) const
+{
+    switch(type)
+    {
+        case Type::Boolean:
+            return boolean();
+
+        case Type::Integer:
+            return integer();
+
+        case Type::Floating:
+            return floating();
+
+        case Type::String:
+            return string();
+
+        default:
+            return Some();
+    }
 }
 
 bool Literal::boolean() const
@@ -122,19 +143,19 @@ bool Literal::boolean() const
     }
     else if(isBoolean())
     {
-        return _m_value.cast<bool>();
+        return _m_value.as<bool>();
     }
     else if(isInteger())
     {
-        return (bool)_m_value.cast<int>();
+        return (bool)_m_value.as<int>();
     }
     else if(isFloating())
     {
-        return (bool)_m_value.cast<float>();
+        return (bool)_m_value.as<float>();
     }
     else if(isString())
     {
-        std::istringstream ss(_m_value.cast<std::string>());
+        std::istringstream ss(_m_value.as<std::string>());
         bool value;
         ss >> value;
         return value;
@@ -151,19 +172,19 @@ int Literal::integer() const
     }
     else if(isBoolean())
     {
-        return (int)_m_value.cast<bool>();
+        return (int)_m_value.as<bool>();
     }
     else if(isInteger())
     {
-        return _m_value.cast<int>();
+        return _m_value.as<int>();
     }
     else if(isFloating())
     {
-        return (int)_m_value.cast<float>();
+        return (int)_m_value.as<float>();
     }
     else if(isString())
     {
-        std::istringstream ss(_m_value.cast<std::string>());
+        std::istringstream ss(_m_value.as<std::string>());
         int value;
         ss >> value;
         return value;
@@ -180,19 +201,19 @@ float Literal::floating() const
     }
     else if(isBoolean())
     {
-        return (float)_m_value.cast<bool>();
+        return (float)_m_value.as<bool>();
     }
     else if(isInteger())
     {
-        return (float)_m_value.cast<int>();
+        return (float)_m_value.as<int>();
     }
     else if(isFloating())
     {
-        return _m_value.cast<float>();
+        return _m_value.as<float>();
     }
     else if(isString())
     {
-        std::istringstream ss(_m_value.cast<std::string>());
+        std::istringstream ss(_m_value.as<std::string>());
         float value;
         ss >> value;
         return value;
@@ -210,24 +231,24 @@ std::string Literal::string() const
     else if(isBoolean())
     {
         std::ostringstream ss;
-        ss << _m_value.cast<bool>();
+        ss << _m_value.as<bool>();
         return ss.str();
     }
     else if(isInteger())
     {
         std::ostringstream ss;
-        ss << _m_value.cast<int>();
+        ss << _m_value.as<int>();
         return ss.str();
     }
     else if(isFloating())
     {
         std::ostringstream ss;
-        ss << _m_value.cast<float>();
+        ss << _m_value.as<float>();
         return ss.str();
     }
     else if(isString())
     {
-        return _m_value.cast<std::string>();
+        return _m_value.as<std::string>();
     }
 
     return "";

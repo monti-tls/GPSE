@@ -62,7 +62,7 @@ namespace gpse
                         for(lang::Node*& child : call->children())
                         {
                             pass->pass(child);
-                            core::Type rtp = pass->storage().cast<core::Type>();
+                            core::Type rtp = pass->storage().as<core::Type>();
                             if(arg_it->type() != rtp)
                             {
                                 child->error("invalid implicit type conversion");
@@ -94,7 +94,7 @@ namespace gpse
                         for(lang::Node*& child : call->children())
                         {
                             pass->pass(child);
-                            core::Type rtp = pass->storage().cast<core::Type>();
+                            core::Type rtp = pass->storage().as<core::Type>();
                             if(arg_it->type() != rtp)
                             {
                                 child->error("invalid implicit type conversion");
@@ -121,9 +121,9 @@ namespace gpse
                     else if(expression->isBinary())
                     {
                         pass->pass(expression->children()[0]);
-                        core::Type ltp = pass->storage().cast<core::Type>();
+                        core::Type ltp = pass->storage().as<core::Type>();
                         pass->pass(expression->children()[1]);
-                        core::Type rtp = pass->storage().cast<core::Type>();
+                        core::Type rtp = pass->storage().as<core::Type>();
 
                         if(ltp != rtp)
                         {
@@ -143,7 +143,7 @@ namespace gpse
                     {
                         core::Type ltp = decl->variable().type();
                         pass->pass(decl->children()[0]);
-                        core::Type rtp = pass->storage().cast<core::Type>();
+                        core::Type rtp = pass->storage().as<core::Type>();
 
                         if(ltp != rtp)
                         {
@@ -161,7 +161,7 @@ namespace gpse
                 {
                     core::Type ltp = assign->variable().type();
                     pass->pass(assign->children()[0]);
-                    core::Type rtp = pass->storage().cast<core::Type>();
+                    core::Type rtp = pass->storage().as<core::Type>();
 
                     if(ltp != rtp)
                     {
@@ -185,7 +185,7 @@ namespace gpse
                     if(stat->children().size())
                     {
                         pass->pass(stat->children()[0]);
-                        rtp = pass->storage().cast<core::Type>();
+                        rtp = pass->storage().as<core::Type>();
                     }
 
                     if(ltp != rtp)

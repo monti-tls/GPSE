@@ -47,10 +47,40 @@ namespace gpse
             }
 
             template <typename T>
-            struct WhichType
+            inline core::Type whichType()
             {
-                static const core::Type type;
-            };
+                return core::Type::Opaque;
+            }
+
+            template <>
+            inline core::Type whichType<void>()
+            {
+                return core::Type::Nil;
+            }
+
+            template <>
+            inline core::Type whichType<int>()
+            {
+                return core::Type::Integer;
+            }
+
+            template <>
+            inline core::Type whichType<float>()
+            {
+                return core::Type::Floating;
+            }
+
+            template <>
+            inline core::Type whichType<std::string>()
+            {
+                return core::Type::String;
+            }
+
+            template <>
+            inline core::Type whichType<bool>()
+            {
+                return core::Type::Boolean;
+            }
 
             class AbstractCallback
             {
@@ -81,37 +111,35 @@ namespace gpse
 
                 core::Prototype prototype() const
                 {
-                    return core::Prototype(WhichType<TRet>::type, _M_argumentTypes((TArgs*)nullptr...));
+                    return core::Prototype(whichType<TRet>(), _M_argumentTypes((TArgs*)nullptr...));
                 }
 
             protected:
                 template <typename A, typename... Args>
                 std::tuple<A, Args...> _M_call(std::vector<core::Some>::const_iterator it, A*, Args*... args)
                 {
-                    std::tuple<A> first = std::make_tuple(it->cast<A>());
+                    std::tuple<A> first = std::make_tuple(it->as<A>());
                     std::tuple<Args...> second = this->_M_call(++it, args...);
                     return std::tuple_cat(first, second);
                 }
 
-                template <typename A>
-                std::tuple<A> _M_call(std::vector<core::Some>::const_iterator it, A*)
+                std::tuple<> _M_call(std::vector<core::Some>::const_iterator it)
                 {
-                    return std::make_tuple(it->cast<A>());
+                    return std::tuple<>();
                 }
 
                 template <typename A, typename... Args>
                 std::vector<core::Type> _M_argumentTypes(A*, Args*... args) const
                 {
                     std::vector<core::Type> vec = this->_M_argumentTypes(args...);
-                    vec.push_back(WhichType<A>::type);
+                    vec.push_back(whichType<A>());
 
                     return vec;
                 }
 
-                template <typename A>
-                std::vector<core::Type> _M_argumentTypes(A*) const
+                std::vector<core::Type> _M_argumentTypes() const
                 {
-                    return std::vector<core::Type>({WhichType<A>::type});
+                    return std::vector<core::Type>();
                 }
 
             protected:
