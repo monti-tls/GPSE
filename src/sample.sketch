@@ -1,25 +1,17 @@
-fun factorial(int n) -> int
+fun fac(int n) -> int
 {
 	if (n == 1)
-	{
 		return 1;
-	}
 	else
-	{
-		return factorial(n - 1) * n;
-	}
+		return fac(n - 1) * n;
 }
 
 fun fabs(float x) -> float
 {
 	if (x < 0.0)
-	{
 		return -x;
-	}
 	else
-	{
 		return x;
-	}
 }
 
 fun sqrt(float x) -> float
@@ -28,9 +20,7 @@ fun sqrt(float x) -> float
 	float y = 0.0;
 
 	if (x < 0.0)
-	{
 		return 0.0;
-	}
 
 	while (fabs(yn - y) > 1e-6)
 	{
@@ -44,21 +34,16 @@ fun sqrt(float x) -> float
 fun ack(int m, int n) -> int
 {
 	if (m == 0)
-	{
 		return n + 1;
-	}
 	else
 	{
 		if (n == 0)
-		{
 			return ack(m - 1, 1);
-		}
 		else
-		{
 			return ack(m - 1, ack(m, n - 1));
-		}
 	}
 }
 
+__trace__((string) fac(5));
 __trace__((string) sqrt(25.0));
 __trace__((string) ack(3, 2));

@@ -702,30 +702,14 @@ namespace gpse
                         return nullptr;
                     }
 
-                    p->scope()->down();
-
-                    if(!p->eat(LCURLY, tok))
-                    {
-                        p->error("expected `{'");
-                        return nullptr;
-                    }
-
                     lang::Node* block = p->parse("statement_block");
                     if(!block)
                     {
                         return nullptr;
                     }
 
-                    if(!p->eat(RCURLY, tok))
-                    {
-                        p->error("expected `}'");
-                        return nullptr;
-                    }
-
                     lang::Node* node = new IfBlockNode(condition, block);
                     node->setToken(s_tok);
-                    node->setScopeLayer(&p->scope()->layer());
-                    p->scope()->up();
 
                     return node;
                 };
@@ -768,30 +752,14 @@ namespace gpse
                         return nullptr;
                     }
 
-                    p->scope()->down();
-
-                    if(!p->eat(LCURLY, tok))
-                    {
-                        p->error("expected `{'");
-                        return nullptr;
-                    }
-
                     lang::Node* block = p->parse("statement_block");
                     if(!block)
                     {
                         return nullptr;
                     }
 
-                    if(!p->eat(RCURLY, tok))
-                    {
-                        p->error("expected `}'");
-                        return nullptr;
-                    }
-
                     lang::Node* node = new ElifBlockNode(condition, block);
                     node->setToken(s_tok);
-                    node->setScopeLayer(&p->scope()->layer());
-                    p->scope()->up();
 
                     return node;
                 };
@@ -834,30 +802,14 @@ namespace gpse
                         return nullptr;
                     }
 
-                    p->scope()->down();
-
-                    if(!p->eat(LCURLY, tok))
-                    {
-                        p->error("expected `{'");
-                        return nullptr;
-                    }
-
                     lang::Node* block = p->parse("statement_block");
                     if(!block)
                     {
                         return nullptr;
                     }
 
-                    if(!p->eat(RCURLY, tok))
-                    {
-                        p->error("expected `}'");
-                        return nullptr;
-                    }
-
                     lang::Node* node = new WhileBlockNode(condition, block);
                     node->setToken(s_tok);
-                    node->setScopeLayer(&p->scope()->layer());
-                    p->scope()->up();
 
                     return node;
                 };
@@ -882,30 +834,14 @@ namespace gpse
                         return nullptr;
                     }
 
-                    p->scope()->down();
-
-                    if(!p->eat(LCURLY, tok))
-                    {
-                        p->error("expected `{'");
-                        return nullptr;
-                    }
-
                     lang::Node* block = p->parse("statement_block");
                     if(!block)
                     {
                         return nullptr;
                     }
 
-                    if(!p->eat(RCURLY, tok))
-                    {
-                        p->error("expected `}'");
-                        return nullptr;
-                    }
-
                     lang::Node* node = new ElseBlockNode(block);
                     node->setToken(s_tok);
-                    node->setScopeLayer(&p->scope()->layer());
-                    p->scope()->up();
 
                     return node;
                 };
@@ -964,12 +900,28 @@ namespace gpse
             {
                 auto pred = [](lang::Parser* p) -> bool
                 {
-                    return p->predicate("statement");
+                    return p->seek().which == LCURLY || p->predicate("statement");
                 };
 
                 auto rule = [](lang::Parser * p) -> lang::Node *
                 {
+                    lang::Token tok;
+
+                    if (p->seek().which != LCURLY)
+                    {
+                        return p->parse("statement");
+                    }
+
+                    if (!p->eat(LCURLY, tok))
+                    {
+                        p->error("expected `{'");
+                        return nullptr;
+                    }
+
                     StatementBlockNode* block = new StatementBlockNode();
+                    block->setToken(tok);
+
+                    p->scope()->down();
 
                     do
                     {
@@ -982,6 +934,16 @@ namespace gpse
 
                         block->children().push_back(statement);
                     } while(p->predicate("statement"));
+
+                    if (!p->eat(RCURLY, tok))
+                    {
+                        delete block;
+                        p->error("expected `}'");
+                        return nullptr;
+                    }
+
+                    block->setScopeLayer(&p->scope()->layer());
+                    p->scope()->up();
 
                     return block;
                 };
@@ -1098,31 +1060,14 @@ namespace gpse
                     p->scope()->layer().parent()->addElement(name, function);
                     p->scope()->layer().addElement("self", function);
 
-                    if(!p->eat(LCURLY, tok))
+                    lang::Node* block = p->parse("statement_block");
+                    if(!block)
                     {
                         delete node;
-                        p->error("expected `{'");
                         return nullptr;
                     }
 
-                    if(p->seek().which != RCURLY)
-                    {
-                        lang::Node* block = p->parse("statement_block");
-                        if(!block)
-                        {
-                            delete node;
-                            return nullptr;
-                        }
-
-                        node->addChild(block);
-                    }
-
-                    if(!p->eat(RCURLY, tok))
-                    {
-                        p->error("expected `}'");
-                        delete node;
-                        return nullptr;
-                    }
+                    node->addChild(block);
 
                     node->setScopeLayer(&p->scope()->layer());
                     p->scope()->up();
