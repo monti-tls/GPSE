@@ -622,7 +622,7 @@ namespace gpse
             {
                 auto pred = [](lang::Parser* p) -> bool
                 {
-                    return p->predicate("variable_declaration") || p->predicate("variable_assign") || p->predicate("return_statement") || p->predicate("conditional_block") || p->predicate("expression");
+                    return p->predicate("variable_declaration") || p->predicate("variable_assign") || p->predicate("return_statement") || p->predicate("conditional_block") || p->predicate("while_block") || p->predicate("expression");
                 };
 
                 auto rule = [](lang::Parser * p) -> lang::Node *
@@ -638,6 +638,10 @@ namespace gpse
                     else if(p->predicate("conditional_block"))
                     {
                         return p->parse("conditional_block");
+                    }
+                    else if(p->predicate("while_block"))
+                    {
+                        return p->parse("while_block");
                     }
                     else if(p->predicate("return_statement"))
                     {
@@ -793,6 +797,72 @@ namespace gpse
                 };
 
                 parser.grammars()["elif_block"] = lang::Grammar(pred, rule);
+            }
+
+            //// while_block ////
+            {
+                auto pred = [](lang::Parser* p) -> bool
+                {
+                    return p->seek().which == K_WHILE;
+                };
+
+                auto rule = [](lang::Parser * p) -> lang::Node *
+                {
+                    lang::Token tok, s_tok;
+
+                    if(!p->eat(K_WHILE, s_tok))
+                    {
+                        p->error("expected `while'");
+                        return nullptr;
+                    }
+
+                    if(!p->eat(LPAR, tok))
+                    {
+                        p->error("expected `('");
+                        return nullptr;
+                    }
+
+                    lang::Node* condition = p->parse("expression");
+                    if(!condition)
+                    {
+                        return nullptr;
+                    }
+
+                    if(!p->eat(RPAR, tok))
+                    {
+                        p->error("expected `)'");
+                        return nullptr;
+                    }
+
+                    p->scope()->down();
+
+                    if(!p->eat(LCURLY, tok))
+                    {
+                        p->error("expected `{'");
+                        return nullptr;
+                    }
+
+                    lang::Node* block = p->parse("statement_block");
+                    if(!block)
+                    {
+                        return nullptr;
+                    }
+
+                    if(!p->eat(RCURLY, tok))
+                    {
+                        p->error("expected `}'");
+                        return nullptr;
+                    }
+
+                    lang::Node* node = new WhileBlockNode(condition, block);
+                    node->setToken(s_tok);
+                    node->setScopeLayer(&p->scope()->layer());
+                    p->scope()->up();
+
+                    return node;
+                };
+
+                parser.grammars()["while_block"] = lang::Grammar(pred, rule);
             }
 
             //// else_block ////

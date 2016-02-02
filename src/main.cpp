@@ -11,7 +11,7 @@
 
 void __trace__(std::string str)
 {
-    std::cout << str;
+    std::cout << str << std::endl;
 }
 
 int main(int argc, char** argv)

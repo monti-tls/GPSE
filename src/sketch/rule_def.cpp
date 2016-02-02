@@ -35,6 +35,7 @@ namespace gpse
             keywords["if"] = K_IF;
             keywords["elif"] = K_ELIF;
             keywords["else"] = K_ELSE;
+            keywords["while"] = K_WHILE;
 
             // MINUS / RETURNS
             {
@@ -177,6 +178,19 @@ namespace gpse
                         {
                             temp += l->get();
                         }
+                    }
+
+                    if (l->hint() == 'e' || l->hint() == 'E')
+                    {
+                        integer = false;
+                        
+                        temp += l->get();
+
+                        if (l->hint() == '-')
+                            temp += l->get();
+
+                        while(std::isdigit(l->hint()))
+                            temp += l->get();
                     }
 
                     if(integer)

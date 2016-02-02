@@ -28,6 +28,7 @@ namespace gpse
             ELIF_BLOCK_NODE,
             ELSE_BLOCK_NODE,
             CONDITIONAL_BLOCK_NODE,
+            WHILE_BLOCK_NODE,
             PROGRAM_NODE
         };
 
@@ -216,6 +217,16 @@ namespace gpse
         public:
             ConditionalBlockNode(lang::Node* parent = nullptr);
             ~ConditionalBlockNode();
+        };
+
+        class WhileBlockNode : public lang::Node
+        {
+        public:
+            WhileBlockNode(lang::Node* condition, lang::Node* block, lang::Node* parent = nullptr);
+            ~WhileBlockNode();
+
+            lang::Node*& condition();
+            lang::Node*& block();
         };
 
         class ProgramNode : public lang::Node

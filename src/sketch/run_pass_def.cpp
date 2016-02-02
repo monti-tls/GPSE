@@ -369,6 +369,25 @@ namespace gpse
                 pass.addOperator<CONDITIONAL_BLOCK_NODE, ConditionalBlockNode>(rule);
             }
 
+            //// WhileBlockNode ////
+            {
+                auto rule = [&](lang::TreePass* pass, lang::Node*& node, WhileBlockNode* block)
+                {
+                    for (;;)
+                    {
+                        pass->pass(block->children()[0]);
+                        bool cond = pass->storage().as<bool>();
+
+                        if (!cond)
+                            break;
+
+                        pass->pass(block->children()[1]);
+                    }
+                };
+
+                pass.addOperator<WHILE_BLOCK_NODE, WhileBlockNode>(rule);
+            }
+
             //// ProgramNode ////
             {
                 auto rule = [&](lang::TreePass* pass, lang::Node*& node, ProgramNode* program)

@@ -46,7 +46,8 @@ namespace gpse
             K_FUN,
             K_IF,
             K_ELIF,
-            K_ELSE
+            K_ELSE,
+            K_WHILE
         };
 
         void setupLexer(lang::Lexer& lexer);

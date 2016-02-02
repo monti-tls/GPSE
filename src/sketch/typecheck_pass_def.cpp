@@ -241,6 +241,20 @@ namespace gpse
                 typeCheck.addOperator<ELIF_BLOCK_NODE, ElifBlockNode>(rule);
             }
 
+            //// WhileBlockNode ////
+            {
+                auto rule = [](lang::TreePass* pass, lang::Node*& node, WhileBlockNode* block)
+                {
+                    pass->pass(block->condition());
+                    core::Type cond_tp = pass->storage().as<core::Type>();
+
+                    if(cond_tp != core::Type::Boolean)
+                        node->error("condition must be boolean");
+                };
+
+                typeCheck.addOperator<WHILE_BLOCK_NODE, WhileBlockNode>(rule);
+            }
+
             return typeCheck;
         }
     }

@@ -258,6 +258,27 @@ ConditionalBlockNode::~ConditionalBlockNode()
 {
 }
 
+WhileBlockNode::WhileBlockNode(lang::Node* condition, lang::Node* block, lang::Node* parent)
+    : lang::Node(WHILE_BLOCK_NODE, parent)
+{
+    addChild(condition);
+    addChild(block);
+}
+
+WhileBlockNode::~WhileBlockNode()
+{
+}
+
+lang::Node*& WhileBlockNode::condition()
+{
+    return children()[0];
+}
+
+lang::Node*& WhileBlockNode::block()
+{
+    return children()[1];
+}
+
 ProgramNode::ProgramNode(lang::Node* parent)
     : lang::Node(PROGRAM_NODE, parent)
 {
