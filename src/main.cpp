@@ -1,82 +1,79 @@
-#include "lang/lexer.hpp"
-#include "lang/parser.hpp"
-#include "sketch/rule_def.hpp"
-#include "sketch/grammar_def.hpp"
-#include "sketch/ast.hpp"
-#include "sketch/pass_def.hpp"
-#include "sketch/runtime_def.hpp"
-#include "core/scope.hpp"
-#include "core/callback.hpp"
+#include "core/core.hpp"
+#include "lang/lang.hpp"
+#include "sketch/sketch.hpp"
 
+#include <lconf/cli.h>
+
+#include <stdexcept>
 #include <iostream>
 #include <string>
-#include <sstream>
 #include <fstream>
-#include <map>
-#include <stack>
-#include <vector>
-#include <tuple>
-#include <cmath>
 
-using namespace gpse;
-
-/* TODO-list :
- *   - separate source directory into core/lang/sketch dirs
- *   - update build system with proper Makefile
- *
- *   - implement conditionals
- *   - cleanup arithmetics (to handle auto casts)
- *   - handle errors better :
- *     - no more silent errors due to nullptrs returned upon AST building
- *     - throw exception on parser / typecheck / other pass error
- */
-
-void print_i(int value)
+int main(int argc, char** argv)
 {
-    std::cout << "print_i(" << value << ")" << std::endl;
-}
+    using namespace gpse;
+    
+    /****************************************/
+    /*** Command-line options definitions ***/
+    /****************************************/
 
-void print_f(float value)
-{
-    std::cout << "print_f(" << value << ")" << std::endl;
-}
+    lconf::cli::Parser options(argc, argv);
 
-void print_s(std::string value)
-{
-    std::cout << "print_s(" << value << ")" << std::endl;
-}
+    options.setProgramDescription("The GPSE Sketch interpreter.");
 
-float mypow(float a, float b)
-{
-    return std::pow(a, b);
-}
+    options.addSwitch('h', "help")
+           .setStop()
+           .setDescription("Print this help");
 
-std::vector<int>* create_vec()
-{
-    return new std::vector<int>({1, 2, 3, 4});
-}
+    options.addSwitch('x', "no-optimize")
+           .setDescription("Don't optimize the script before running");
 
-void print_vec(std::vector<int>* vec)
-{
-    for(auto i : *vec)
-        std::cout << i << " ";
-    std::cout << std::endl;
-}
+    options.addSwitch('p', "print-ast")
+           .setDescription("Print the generated AST");
 
-int main()
-{
-    std::ifstream ss("src/sample.sketch");
+    options.addSwitch('d', "dry-run")
+           .setDescription("Don't run the script");
+    
+    /************************************/
+    /*** Options parsing and checking ***/
+    /************************************/
+
+    try
+    {
+        options.parse();
+    }
+    catch (std::exception const& exc)
+    {
+        std::cerr << "Error: " << exc.what() << std::endl;
+        return -1;
+    }
+
+    if (options.has("help"))
+    {
+        options.showHelp();
+        return 0;
+    }
+
+    if (options.arguments().size() != 1)
+    {
+        std::cerr << "Error: " << argv[0] << " expects exactly one argument." << std::endl;
+        std::cerr << "       Try " << argv[0] << " --help" << std::endl;
+        return -1;
+    }
+
+    /***************************/
+    /*** Actual useful stuff ***/
+    /***************************/
+
+    std::ifstream ss(options.arguments()[0]);
+    if (!ss)
+    {
+        std::cerr << "Error: unable to open \"" << options.arguments()[0] << "\"" << std::endl;
+        return -1;
+    }
 
     core::Scope* scope = new core::Scope();
     sketch::setupScope(scope);
-
-    sketch::expose(scope, "printi", &print_i);
-    sketch::expose(scope, "printf", &print_f);
-    sketch::expose(scope, "prints", &print_s);
-    sketch::expose(scope, "pow", &mypow);
-
-    sketch::expose(scope, "create_vec", &create_vec);
-    sketch::expose(scope, "print_vec", &print_vec);
 
     lang::Lexer lexer(ss, scope);
     sketch::setupLexer(lexer);
@@ -95,18 +92,20 @@ int main()
 
     typecheck.pass(root);
 
-    std::cout << "Parser output :" << std::endl;
-    print.pass(root);
+    if (!options.has("no-optimize"))
+    {
+        optimize.pass(root);
+    }
 
-    /*optimize.pass(root);
+    if (options.has("print-ast"))
+    {
+        print.pass(root);
+    }
 
-    std::cout << "After optimization pass :" << std::endl;
-    print.pass(root);*/
-
-    std::cout << "** Running program **" << std::endl;
-    run.pass(root);
-
-    // std::cout << scope->layer().findRef("foo")->variable().value().as<int>() << std::endl;
+    if (!options.has("dry-run"))
+    {
+        run.pass(root);
+    }
 
     delete root;
     delete scope;

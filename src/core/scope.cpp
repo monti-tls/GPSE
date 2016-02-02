@@ -90,10 +90,16 @@ Symbol* ScopeLayer::findRefInScope(std::string const& name)
 void ScopeLayer::preserve()
 {
     _m_content.push(_m_content.top());
+
+    for (ScopeLayer* child : children())
+        child->preserve();
 }
 
 void ScopeLayer::restore()
 {
+    for (ScopeLayer* child : children())
+        child->restore();
+
     _m_content.pop();
 }
 

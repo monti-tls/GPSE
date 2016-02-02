@@ -13,9 +13,9 @@ DOX_DIR = doxygen
 # Configuration
 PRODUCT  = gpse
 DEFINES  =
-CC_FLAGS = -Wno-unused-parameter
+CC_FLAGS = -Wno-unused-parameter -Ilib/libconf/include
 AS_FLAGS =
-LD_FLAGS =
+LD_FLAGS = -Llib/libconf/bin -lconf
 
 # Mandatory CC flags
 CC_FLAGS += -std=gnu++11 -g -O0
