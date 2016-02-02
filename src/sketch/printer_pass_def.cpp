@@ -317,6 +317,145 @@ namespace gpse
                 pass.addOperator<RETURN_STATEMENT_NODE, ReturnStatementNode>(rule);
             }
 
+            //// IfBlockNode ////
+            {
+                auto rule = [](lang::TreePass* pass, lang::Node*& node, IfBlockNode* stat)
+                {
+                    for(int i = 0; i < indent; ++i)
+                    {
+                        std::cout << "  ";
+                    }
+
+                    std::cout << "{if_block";
+
+                    if(stat->children().size())
+                    {
+                        std::cout << " : " << std::endl;
+
+                        ++indent;
+                        pass->pass(stat->condition());
+                        pass->pass(stat->block());
+                        --indent;
+
+                        for(int i = 0; i < indent; ++i)
+                        {
+                            std::cout << "  ";
+                        }
+                        std::cout << "}" << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "}" << std::endl;
+                    }
+                };
+
+                pass.addOperator<IF_BLOCK_NODE, IfBlockNode>(rule);
+            }
+
+            //// ElifBlockNode ////
+            {
+                auto rule = [](lang::TreePass* pass, lang::Node*& node, ElifBlockNode* stat)
+                {
+                    for(int i = 0; i < indent; ++i)
+                    {
+                        std::cout << "  ";
+                    }
+
+                    std::cout << "{elif_block";
+
+                    if(stat->children().size())
+                    {
+                        std::cout << " : " << std::endl;
+
+                        ++indent;
+                        pass->pass(stat->condition());
+                        pass->pass(stat->block());
+                        --indent;
+
+                        for(int i = 0; i < indent; ++i)
+                        {
+                            std::cout << "  ";
+                        }
+                        std::cout << "}" << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "}" << std::endl;
+                    }
+                };
+
+                pass.addOperator<ELIF_BLOCK_NODE, ElifBlockNode>(rule);
+            }
+
+            //// ElseBlockNode ////
+            {
+                auto rule = [](lang::TreePass* pass, lang::Node*& node, ElseBlockNode* stat)
+                {
+                    for(int i = 0; i < indent; ++i)
+                    {
+                        std::cout << "  ";
+                    }
+
+                    std::cout << "{else_block";
+
+                    if(stat->children().size())
+                    {
+                        std::cout << " : " << std::endl;
+
+                        ++indent;
+                        pass->pass(stat->block());
+                        --indent;
+
+                        for(int i = 0; i < indent; ++i)
+                        {
+                            std::cout << "  ";
+                        }
+                        std::cout << "}" << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "}" << std::endl;
+                    }
+                };
+
+                pass.addOperator<ELSE_BLOCK_NODE, ElseBlockNode>(rule);
+            }
+
+            //// ConditionalBlockNode ////
+            {
+                auto rule = [](lang::TreePass* pass, lang::Node*& node, ConditionalBlockNode* stat)
+                {
+                    for(int i = 0; i < indent; ++i)
+                    {
+                        std::cout << "  ";
+                    }
+
+                    std::cout << "{conditional_block";
+
+                    if(stat->children().size())
+                    {
+                        std::cout << " : " << std::endl;
+
+                        ++indent;
+                        for(lang::Node*& block : stat->children())
+                            pass->pass(block);
+                        --indent;
+
+                        for(int i = 0; i < indent; ++i)
+                        {
+                            std::cout << "  ";
+                        }
+                        std::cout << "}" << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "}" << std::endl;
+                    }
+                };
+
+                pass.addOperator<CONDITIONAL_BLOCK_NODE, ConditionalBlockNode>(rule);
+            }
+
             //// StatementBlockNode ////
             {
                 auto rule = [](lang::TreePass* pass, lang::Node*& node, StatementBlockNode* block)

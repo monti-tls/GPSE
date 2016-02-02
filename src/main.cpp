@@ -41,6 +41,11 @@ void print_f(float value)
     std::cout << "print_f(" << value << ")" << std::endl;
 }
 
+void print_s(std::string value)
+{
+    std::cout << "print_s(" << value << ")" << std::endl;
+}
+
 float mypow(float a, float b)
 {
     return std::pow(a, b);
@@ -53,7 +58,8 @@ std::vector<int>* create_vec()
 
 void print_vec(std::vector<int>* vec)
 {
-    for(auto i : *vec) std::cout << i << " ";
+    for(auto i : *vec)
+        std::cout << i << " ";
     std::cout << std::endl;
 }
 
@@ -66,6 +72,7 @@ int main()
 
     sketch::expose(scope, "printi", &print_i);
     sketch::expose(scope, "printf", &print_f);
+    sketch::expose(scope, "prints", &print_s);
     sketch::expose(scope, "pow", &mypow);
 
     sketch::expose(scope, "create_vec", &create_vec);
@@ -78,7 +85,8 @@ int main()
     sketch::setupParser(parser);
 
     lang::Node* root = parser.parseRaw("program");
-    if(!root) return -1;
+    if(!root)
+        return -1;
 
     lang::TreePass print = sketch::getPrinterPass();
     lang::TreePass typecheck = sketch::getTypecheckPass();

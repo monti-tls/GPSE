@@ -192,6 +192,72 @@ core::Function const& FunctionDeclarationNode::function() const
     return _m_function;
 }
 
+IfBlockNode::IfBlockNode(lang::Node* condition, lang::Node* block, lang::Node* parent)
+    : lang::Node(IF_BLOCK_NODE, parent)
+{
+    addChild(condition);
+    addChild(block);
+}
+
+IfBlockNode::~IfBlockNode()
+{
+}
+
+lang::Node*& IfBlockNode::condition()
+{
+    return children()[0];
+}
+
+lang::Node*& IfBlockNode::block()
+{
+    return children()[1];
+}
+
+ElifBlockNode::ElifBlockNode(lang::Node* condition, lang::Node* block, lang::Node* parent)
+    : lang::Node(ELIF_BLOCK_NODE, parent)
+{
+    addChild(condition);
+    addChild(block);
+}
+
+ElifBlockNode::~ElifBlockNode()
+{
+}
+
+lang::Node*& ElifBlockNode::condition()
+{
+    return children()[0];
+}
+
+lang::Node*& ElifBlockNode::block()
+{
+    return children()[1];
+}
+
+ElseBlockNode::ElseBlockNode(lang::Node* block, lang::Node* parent)
+    : lang::Node(ELSE_BLOCK_NODE, parent)
+{
+    addChild(block);
+}
+
+ElseBlockNode::~ElseBlockNode()
+{
+}
+
+lang::Node*& ElseBlockNode::block()
+{
+    return children()[0];
+}
+
+ConditionalBlockNode::ConditionalBlockNode(lang::Node* parent)
+    : lang::Node(CONDITIONAL_BLOCK_NODE, parent)
+{
+}
+
+ConditionalBlockNode::~ConditionalBlockNode()
+{
+}
+
 ProgramNode::ProgramNode(lang::Node* parent)
     : lang::Node(PROGRAM_NODE, parent)
 {

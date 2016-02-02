@@ -43,7 +43,10 @@ namespace gpse
             K_TRUE,
             K_FALSE,
             K_RETURN,
-            K_FUN
+            K_FUN,
+            K_IF,
+            K_ELIF,
+            K_ELSE
         };
 
         void setupLexer(lang::Lexer& lexer);

@@ -44,7 +44,8 @@ void ScopeLayer::addElement(std::string const& name, Symbol const& element)
 bool ScopeLayer::find(std::string const& name, Symbol* element)
 {
     Symbol* sym = findRef(name);
-    if(sym && element) *element = *sym;
+    if(sym && element)
+        *element = *sym;
 
     return sym;
 }
@@ -52,7 +53,8 @@ bool ScopeLayer::find(std::string const& name, Symbol* element)
 bool ScopeLayer::findInScope(std::string const& name, Symbol* element)
 {
     Symbol* sym = findRefInScope(name);
-    if(sym && element) *element = *sym;
+    if(sym && element)
+        *element = *sym;
 
     return sym;
 }
@@ -82,6 +84,21 @@ Symbol* ScopeLayer::findRefInScope(std::string const& name)
     }
 
     return nullptr;
+}
+
+ScopeLayer* ScopeLayer::clone() const
+{
+    ScopeLayer* cloned = new ScopeLayer(parent());
+    cloned->_m_content = _m_content;
+
+    for(auto child : _m_children)
+    {
+        ScopeLayer* cloned_child = child->clone();
+        cloned_child->_m_parent = cloned;
+        cloned->_m_children.push_back(cloned_child);
+    }
+
+    return cloned;
 }
 
 Scope::Scope()

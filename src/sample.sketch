@@ -3,9 +3,18 @@ fun double(int a) -> int
 	return (1 + 1) * a;
 }
 
-printi(3);
-printf(pow(3.0, 4.0));
-printi(((int) "123") + 321);
+fun factorial(int n) -> int
+{
+	printi(n);
 
-opaque v = create_vec();
-print_vec(v);
+	if (n == 1)
+	{
+		return 1;
+	}
+	else
+	{
+		return n * factorial(n - 1);
+	}
+}
+
+printi(factorial(5));

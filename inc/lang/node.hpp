@@ -23,8 +23,6 @@ namespace gpse
             Token const& token() const;
             void setParser(Parser* parser);
             Parser* parser() const;
-            void setScope(core::Scope* scope);
-            core::Scope* scope() const;
             void setScopeLayer(core::ScopeLayer* layer);
             core::ScopeLayer* scopeLayer() const;
 
@@ -43,7 +41,6 @@ namespace gpse
             lang::Token _m_token;
             Parser* _m_parser;
             Node* _m_parent;
-            core::Scope* _m_scope;
             core::ScopeLayer* _m_scopeLayer;
             std::vector<Node*> _m_children;
         };

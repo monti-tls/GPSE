@@ -24,6 +24,10 @@ namespace gpse
             RETURN_STATEMENT_NODE,
             STATEMENT_BLOCK_NODE,
             FUNCTION_DECLARATION_NODE,
+            IF_BLOCK_NODE,
+            ELIF_BLOCK_NODE,
+            ELSE_BLOCK_NODE,
+            CONDITIONAL_BLOCK_NODE,
             PROGRAM_NODE
         };
 
@@ -176,6 +180,42 @@ namespace gpse
 
         private:
             core::Function _m_function;
+        };
+
+        class IfBlockNode : public lang::Node
+        {
+        public:
+            IfBlockNode(lang::Node* condition, lang::Node* block, lang::Node* parent = nullptr);
+            ~IfBlockNode();
+
+            lang::Node*& condition();
+            lang::Node*& block();
+        };
+
+        class ElifBlockNode : public lang::Node
+        {
+        public:
+            ElifBlockNode(lang::Node* condition, lang::Node* block, lang::Node* parent = nullptr);
+            ~ElifBlockNode();
+
+            lang::Node*& condition();
+            lang::Node*& block();
+        };
+
+        class ElseBlockNode : public lang::Node
+        {
+        public:
+            ElseBlockNode(lang::Node* block, lang::Node* parent = nullptr);
+            ~ElseBlockNode();
+
+            lang::Node*& block();
+        };
+
+        class ConditionalBlockNode : public lang::Node
+        {
+        public:
+            ConditionalBlockNode(lang::Node* parent = nullptr);
+            ~ConditionalBlockNode();
         };
 
         class ProgramNode : public lang::Node

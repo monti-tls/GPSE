@@ -26,7 +26,6 @@ namespace gpse
                 auto rule = [&](lang::TreePass* pass, lang::Node*& node, LiteralNode* literal)
                 {
                     core::Literal const& val = literal->value();
-                    // stack_push(pass, val.value());
 
                     pass->storage() = val.value();
                 };
@@ -53,20 +52,43 @@ namespace gpse
                     // Retrieve the function body AST
                     lang::Node* fun_body = call->value().node();
 
+                    // Compute argument values
+                    std::vector<core::Some> arg_values;
+                    for(lang::Node*& arg_expr : call->children())
+                    {
+                        pass->pass(arg_expr);
+                        core::Some val = pass->storage();
+                        arg_values.push_back(val);
+                    }
+
+                    // Save the old scope layer (containing arguments and locals)
+                    core::ScopeLayer* old_layer = fun_body->scopeLayer();
+                    // Push a fresh one
+                    fun_body->setScopeLayer(old_layer->clone());
+
+                    /*** HUGE TODO:
+                     ***    -> need to change ALL scope layers for
+                     ***       ALL child nodes of the function body, including sub-scopes :-(
+                     ***/
+
                     // Set up argument values
-                    std::vector<lang::Node*>::iterator it = call->children().begin();
+                    std::vector<core::Some>::iterator arg_val_it = arg_values.begin();
                     for(core::Variable const& arg : call->value().prototype().args())
                     {
-                        // Compute expression result
-                        pass->pass(*it++);
-
                         // Retrieve the reference to the argument
                         core::Variable& var = variable_ref(fun_body, arg);
-                        var.setValue(pass->storage());
+                        var.setValue(*arg_val_it++);
+
+                        std::cout << var.name() << "@" << &var << std::endl;
+                        std::cout << var.value().as<int>() << std::endl;
                     }
 
                     // Pass over function body
                     pass->pass(fun_body->children()[0]);
+
+                    // Restore scope layer
+                    delete fun_body->scopeLayer();
+                    fun_body->setScopeLayer(old_layer);
                 };
 
                 pass.addOperator<FUNCTION_CALL_NODE, FunctionCallNode>(rule);
@@ -83,7 +105,8 @@ namespace gpse
                     {
                         // Compute expression result
                         pass->pass(n);
-                        args.push_back(pass->storage());
+                        core::Some val = pass->storage();
+                        args.push_back(val);
                     }
 
                     // Invoke callback
@@ -100,7 +123,8 @@ namespace gpse
                     pass->pass(node->children()[0]);
                     core::Literal value = pass->storage();
 
-                    if(cast->to() == core::Type::Opaque || cast->to() == core::Type::Nil) node->error("invalid cast");
+                    if(cast->to() == core::Type::Opaque || cast->to() == core::Type::Nil)
+                        node->error("invalid cast");
 
                     pass->storage() = value.cast(cast->to());
                 };
@@ -121,12 +145,14 @@ namespace gpse
                         if(expression->unaryOperation() == ExpressionNode::Unary::Neg)
                         {
                             result = (-value).value();
-                            if(!result.valid()) node->error("negating something not a number");
+                            if(!result.valid())
+                                node->error("negating something not a number");
                         }
                         else if(expression->unaryOperation() == ExpressionNode::Unary::Not)
                         {
                             result = (!value).value();
-                            if(!result.valid()) node->error("not'ing something not a boolean");
+                            if(!result.valid())
+                                node->error("not'ing something not a boolean");
                         }
 
                         pass->storage() = result;
@@ -145,62 +171,74 @@ namespace gpse
                         {
                             case ExpressionNode::Binary::Add:
                                 result = (lhs + rhs).value();
-                                if(!result.valid()) node->error("not adding numbers");
+                                if(!result.valid())
+                                    node->error("not adding numbers");
                                 break;
 
                             case ExpressionNode::Binary::Sub:
                                 result = (lhs - rhs).value();
-                                if(!result.valid()) node->error("not subtracting numbers");
+                                if(!result.valid())
+                                    node->error("not subtracting numbers");
                                 break;
 
                             case ExpressionNode::Binary::Mul:
                                 result = (lhs * rhs).value();
-                                if(!result.valid()) node->error("not adding numbers");
+                                if(!result.valid())
+                                    node->error("not adding numbers");
                                 break;
 
                             case ExpressionNode::Binary::Div:
                                 result = (lhs / rhs).value();
-                                if(!result.valid()) node->error("not dividing numbers");
+                                if(!result.valid())
+                                    node->error("not dividing numbers");
                                 break;
 
                             case ExpressionNode::Binary::Lt:
                                 result = (lhs < rhs).value();
-                                if(!result.valid()) node->error("not comparing numbers");
+                                if(!result.valid())
+                                    node->error("not comparing numbers");
                                 break;
 
                             case ExpressionNode::Binary::Lte:
                                 result = (lhs <= rhs).value();
-                                if(!result.valid()) node->error("not comparing numbers");
+                                if(!result.valid())
+                                    node->error("not comparing numbers");
                                 break;
 
                             case ExpressionNode::Binary::Gt:
                                 result = (lhs > rhs).value();
-                                if(!result.valid()) node->error("not comparing numbers");
+                                if(!result.valid())
+                                    node->error("not comparing numbers");
                                 break;
 
                             case ExpressionNode::Binary::Gte:
                                 result = (lhs >= rhs).value();
-                                if(!result.valid()) node->error("not comparing numbers");
+                                if(!result.valid())
+                                    node->error("not comparing numbers");
                                 break;
 
                             case ExpressionNode::Binary::Eq:
                                 result = (lhs == rhs).value();
-                                if(!result.valid()) node->error("not comparing numbers");
+                                if(!result.valid())
+                                    node->error("not comparing numbers");
                                 break;
 
                             case ExpressionNode::Binary::Neq:
                                 result = (lhs != rhs).value();
-                                if(!result.valid()) node->error("not comparing numbers");
+                                if(!result.valid())
+                                    node->error("not comparing numbers");
                                 break;
 
                             case ExpressionNode::Binary::And:
                                 result = (lhs && rhs).value();
-                                if(!result.valid()) node->error("not and'ing booleans");
+                                if(!result.valid())
+                                    node->error("not and'ing booleans");
                                 break;
 
                             case ExpressionNode::Binary::Or:
                                 result = (lhs || rhs).value();
-                                if(!result.valid()) node->error("not or'ing booleans");
+                                if(!result.valid())
+                                    node->error("not or'ing booleans");
                                 break;
                         }
 
@@ -280,6 +318,66 @@ namespace gpse
                 };
 
                 pass.addOperator<FUNCTION_DECLARATION_NODE, FunctionDeclarationNode>(rule);
+            }
+
+            //// IfBlockNode ////
+            {
+                auto rule = [&](lang::TreePass* pass, lang::Node*& node, IfBlockNode* if_block)
+                {
+                    // Always pass on implementation block,
+                    //   condition checking is done in ConditionalBlockNode
+                    pass->pass(if_block->children()[1]);
+                };
+
+                pass.addOperator<IF_BLOCK_NODE, IfBlockNode>(rule);
+            }
+
+            //// ElifBlockNode ////
+            {
+                auto rule = [&](lang::TreePass* pass, lang::Node*& node, ElifBlockNode* elif_block)
+                {
+                    // Always pass on implementation block,
+                    //   condition checking is done in ConditionalBlockNode
+                    pass->pass(elif_block->children()[1]);
+                };
+
+                pass.addOperator<ELIF_BLOCK_NODE, ElifBlockNode>(rule);
+            }
+
+            //// ElseBlockNode ////
+            {
+                auto rule = [&](lang::TreePass* pass, lang::Node*& node, ElseBlockNode* else_block)
+                {
+                    // Always pass on implementation block,
+                    //   condition checking is done in ConditionalBlockNode
+                    pass->pass(else_block->children()[0]);
+                };
+
+                pass.addOperator<ELSE_BLOCK_NODE, ElseBlockNode>(rule);
+            }
+
+            //// ConditionalBlockNode ////
+            {
+                auto rule = [&](lang::TreePass* pass, lang::Node*& node, ConditionalBlockNode* cond_block)
+                {
+                    for(lang::Node*& block : cond_block->children())
+                    {
+                        if(block->which() != ELSE_BLOCK_NODE)
+                        {
+                            pass->pass(block->children()[0]);
+
+                            if(pass->storage().as<bool>())
+                            {
+                                pass->pass(block->children()[1]);
+                                break;
+                            }
+                        }
+                        else
+                            pass->pass(block->children()[0]);
+                    }
+                };
+
+                pass.addOperator<CONDITIONAL_BLOCK_NODE, ConditionalBlockNode>(rule);
             }
 
             //// ProgramNode ////

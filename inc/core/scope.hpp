@@ -28,6 +28,8 @@ namespace gpse
             Symbol* findRef(std::string const& name);
             Symbol* findRefInScope(std::string const& name);
 
+            ScopeLayer* clone() const;
+
         private:
             ScopeLayer* _m_parent;
             std::vector<ScopeLayer*> _m_children;

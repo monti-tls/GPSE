@@ -32,6 +32,9 @@ namespace gpse
             keywords["false"] = K_FALSE;
             keywords["return"] = K_RETURN;
             keywords["fun"] = K_FUN;
+            keywords["if"] = K_IF;
+            keywords["elif"] = K_ELIF;
+            keywords["else"] = K_ELSE;
 
             // MINUS / RETURNS
             {
@@ -264,7 +267,8 @@ namespace gpse
                         if(r == '\\')
                         {
                             r = l->get();
-                            if(r == -1) break;
+                            if(r == -1)
+                                break;
                             if(r == 'n')
                                 temp += '\n';
                             else if(r == 'r')

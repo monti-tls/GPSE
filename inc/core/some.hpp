@@ -51,19 +51,22 @@ namespace gpse
 
             ~Some()
             {
-                if(_m_data) delete _m_data;
+                if(_m_data)
+                    delete _m_data;
             }
 
             Some& operator=(Some const& cpy)
             {
-                if(_m_data) delete _m_data;
+                if(_m_data)
+                    delete _m_data;
                 _m_data = cpy._m_data ? cpy._m_data->copy() : nullptr;
                 return *this;
             }
 
             Some& operator=(Some&& tmp)
             {
-                if(_m_data) delete _m_data;
+                if(_m_data)
+                    delete _m_data;
                 _m_data = tmp._m_data;
                 tmp._m_data = nullptr;
                 return *this;
@@ -71,7 +74,8 @@ namespace gpse
 
             void clear()
             {
-                if(!_m_data) return;
+                if(!_m_data)
+                    return;
 
                 delete _m_data;
                 _m_data = nullptr;
@@ -95,8 +99,10 @@ namespace gpse
 
             bool same(Some const& other) const
             {
-                if(!other._m_data && !_m_data) return true;
-                if(!other._m_data || !_m_data) return false;
+                if(!other._m_data && !_m_data)
+                    return true;
+                if(!other._m_data || !_m_data)
+                    return false;
 
                 return other._m_data->id() == _m_data->id();
             }

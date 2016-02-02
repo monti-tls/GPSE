@@ -127,7 +127,22 @@ namespace gpse
 
                         if(ltp != rtp)
                         {
-                            expression->error("invalid implicit type conversion");
+                            node->error("invalid implicit type conversion");
+                        }
+
+                        ExpressionNode::Binary op = expression->binaryOperation();
+                        switch(op)
+                        {
+                            case ExpressionNode::Binary::Lt:
+                            case ExpressionNode::Binary::Lte:
+                            case ExpressionNode::Binary::Gt:
+                            case ExpressionNode::Binary::Gte:
+                            case ExpressionNode::Binary::Eq:
+                            case ExpressionNode::Binary::Neq:
+                                pass->storage() = core::Type::Boolean;
+
+                            default:
+                                break;
                         }
                     }
                 };
@@ -147,7 +162,7 @@ namespace gpse
 
                         if(ltp != rtp)
                         {
-                            decl->error("invalid implicit type conversion");
+                            node->error("invalid implicit type conversion");
                         }
                     }
                 };
@@ -165,7 +180,7 @@ namespace gpse
 
                     if(ltp != rtp)
                     {
-                        assign->error("invalid implicit type conversion");
+                        node->error("invalid implicit type conversion");
                     }
                 };
 
@@ -177,7 +192,8 @@ namespace gpse
                 auto rule = [](lang::TreePass* pass, lang::Node*& node, ReturnStatementNode* stat)
                 {
                     core::Symbol self;
-                    if(!node->scopeLayer()->findInScope("self", &self)) stat->error("return statement not in function !?");
+                    if(!node->scopeLayer()->findInScope("self", &self))
+                        stat->error("return statement not in function !?");
 
                     core::Type ltp = self.function().prototype().ret();
 
@@ -190,11 +206,39 @@ namespace gpse
 
                     if(ltp != rtp)
                     {
-                        stat->error("invalid implicit type conversion");
+                        node->error("invalid implicit type conversion");
                     }
                 };
 
                 typeCheck.addOperator<RETURN_STATEMENT_NODE, ReturnStatementNode>(rule);
+            }
+
+            //// IfBlockNode ////
+            {
+                auto rule = [](lang::TreePass* pass, lang::Node*& node, IfBlockNode* block)
+                {
+                    pass->pass(block->condition());
+                    core::Type cond_tp = pass->storage().as<core::Type>();
+
+                    if(cond_tp != core::Type::Boolean)
+                        node->error("condition must be boolean");
+                };
+
+                typeCheck.addOperator<IF_BLOCK_NODE, IfBlockNode>(rule);
+            }
+
+            //// ElifBlockNode ////
+            {
+                auto rule = [](lang::TreePass* pass, lang::Node*& node, ElifBlockNode* block)
+                {
+                    pass->pass(block->condition());
+                    core::Type cond_tp = pass->storage().as<core::Type>();
+
+                    if(cond_tp != core::Type::Boolean)
+                        node->error("condition must be boolean");
+                };
+
+                typeCheck.addOperator<ELIF_BLOCK_NODE, ElifBlockNode>(rule);
             }
 
             return typeCheck;

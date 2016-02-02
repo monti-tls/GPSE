@@ -622,7 +622,7 @@ namespace gpse
             {
                 auto pred = [](lang::Parser* p) -> bool
                 {
-                    return p->predicate("variable_declaration") || p->predicate("variable_assign") || p->predicate("return_statement");
+                    return p->predicate("variable_declaration") || p->predicate("variable_assign") || p->predicate("return_statement") || p->predicate("conditional_block") || p->predicate("expression");
                 };
 
                 auto rule = [](lang::Parser * p) -> lang::Node *
@@ -635,13 +635,247 @@ namespace gpse
                     {
                         return p->parse("variable_declaration");
                     }
-                    else // if(p->predicate("return_statement"))
+                    else if(p->predicate("conditional_block"))
+                    {
+                        return p->parse("conditional_block");
+                    }
+                    else if(p->predicate("return_statement"))
                     {
                         return p->parse("return_statement");
+                    }
+                    else
+                    {
+                        lang::Node* node = p->parse("expression");
+
+                        lang::Token tok;
+                        if(!p->eat(SEMICOLON, tok))
+                        {
+                            p->error("expected `;'");
+
+                            delete node;
+                            return nullptr;
+                        }
+
+                        return node;
                     }
                 };
 
                 parser.grammars()["statement"] = lang::Grammar(pred, rule);
+            }
+
+            //// if_block ////
+            {
+                auto pred = [](lang::Parser* p) -> bool
+                {
+                    return p->seek().which == K_IF;
+                };
+
+                auto rule = [](lang::Parser * p) -> lang::Node *
+                {
+                    lang::Token tok, s_tok;
+
+                    if(!p->eat(K_IF, s_tok))
+                    {
+                        p->error("expected `if'");
+                        return nullptr;
+                    }
+
+                    if(!p->eat(LPAR, tok))
+                    {
+                        p->error("expected `('");
+                        return nullptr;
+                    }
+
+                    lang::Node* condition = p->parse("expression");
+                    if(!condition)
+                    {
+                        return nullptr;
+                    }
+
+                    if(!p->eat(RPAR, tok))
+                    {
+                        p->error("expected `)'");
+                        return nullptr;
+                    }
+
+                    if(!p->eat(LCURLY, tok))
+                    {
+                        p->error("expected `{'");
+                        return nullptr;
+                    }
+
+                    lang::Node* block = p->parse("statement_block");
+                    if(!block)
+                    {
+                        return nullptr;
+                    }
+
+                    if(!p->eat(RCURLY, tok))
+                    {
+                        p->error("expected `}'");
+                        return nullptr;
+                    }
+
+                    lang::Node* node = new IfBlockNode(condition, block);
+                    node->setToken(s_tok);
+
+                    return node;
+                };
+
+                parser.grammars()["if_block"] = lang::Grammar(pred, rule);
+            }
+
+            //// elif_block ////
+            {
+                auto pred = [](lang::Parser* p) -> bool
+                {
+                    return p->seek().which == K_ELIF;
+                };
+
+                auto rule = [](lang::Parser * p) -> lang::Node *
+                {
+                    lang::Token tok, s_tok;
+
+                    if(!p->eat(K_ELIF, s_tok))
+                    {
+                        p->error("expected `elif'");
+                        return nullptr;
+                    }
+
+                    if(!p->eat(LPAR, tok))
+                    {
+                        p->error("expected `('");
+                        return nullptr;
+                    }
+
+                    lang::Node* condition = p->parse("expression");
+                    if(!condition)
+                    {
+                        return nullptr;
+                    }
+
+                    if(!p->eat(RPAR, tok))
+                    {
+                        p->error("expected `)'");
+                        return nullptr;
+                    }
+
+                    if(!p->eat(LCURLY, tok))
+                    {
+                        p->error("expected `{'");
+                        return nullptr;
+                    }
+
+                    lang::Node* block = p->parse("statement_block");
+                    if(!block)
+                    {
+                        return nullptr;
+                    }
+
+                    if(!p->eat(RCURLY, tok))
+                    {
+                        p->error("expected `}'");
+                        return nullptr;
+                    }
+
+                    lang::Node* node = new ElifBlockNode(condition, block);
+                    node->setToken(s_tok);
+
+                    return node;
+                };
+
+                parser.grammars()["elif_block"] = lang::Grammar(pred, rule);
+            }
+
+            //// else_block ////
+            {
+                auto pred = [](lang::Parser* p) -> bool
+                {
+                    return p->seek().which == K_ELSE;
+                };
+
+                auto rule = [](lang::Parser * p) -> lang::Node *
+                {
+                    lang::Token tok, s_tok;
+
+                    if(!p->eat(K_ELSE, s_tok))
+                    {
+                        p->error("expected `else'");
+                        return nullptr;
+                    }
+
+                    if(!p->eat(LCURLY, tok))
+                    {
+                        p->error("expected `{'");
+                        return nullptr;
+                    }
+
+                    lang::Node* block = p->parse("statement_block");
+                    if(!block)
+                    {
+                        return nullptr;
+                    }
+
+                    if(!p->eat(RCURLY, tok))
+                    {
+                        p->error("expected `}'");
+                        return nullptr;
+                    }
+
+                    lang::Node* node = new ElseBlockNode(block);
+                    node->setToken(s_tok);
+
+                    return node;
+                };
+
+                parser.grammars()["else_block"] = lang::Grammar(pred, rule);
+            }
+
+            //// conditional_block ////
+            {
+                auto pred = [](lang::Parser* p) -> bool
+                {
+                    return p->seek().which == K_IF;
+                };
+
+                auto rule = [](lang::Parser * p) -> lang::Node *
+                {
+                    lang::Node* node = new ConditionalBlockNode();
+
+                    lang::Node* if_block = p->parse("if_block");
+                    if(!if_block)
+                    {
+                        delete node;
+                        return nullptr;
+                    }
+                    node->addChild(if_block);
+
+                    while(p->predicate("elif_block"))
+                    {
+                        lang::Node* elif_block = p->parse("elif_block");
+                        if(!elif_block)
+                        {
+                            delete node;
+                            return nullptr;
+                        }
+                        node->addChild(elif_block);
+                    }
+
+                    if(p->predicate("else_block"))
+                    {
+                        lang::Node* else_block = p->parse("else_block");
+                        if(!else_block)
+                        {
+                            delete node;
+                            return nullptr;
+                        }
+                        node->addChild(else_block);
+                    }
+
+                    return node;
+                };
+
+                parser.grammars()["conditional_block"] = lang::Grammar(pred, rule);
             }
 
             //// statement_block ////
@@ -833,24 +1067,12 @@ namespace gpse
 
                         if(p->predicate("function_declaration"))
                             node = p->parse("function_declaration");
-                        else if(p->predicate("statement"))
-                            node = p->parse("statement");
                         else
-                        {
-                            node = p->parse("expression");
-
-                            lang::Token tok;
-                            if(!p->eat(SEMICOLON, tok))
-                            {
-                                p->error("expected `;'");
-
-                                delete program;
-                                return nullptr;
-                            }
-                        }
+                            node = p->parse("statement");
 
                         if(!node)
                         {
+                            p->error("unexpected input");
                             delete program;
                             return nullptr;
                         }

@@ -135,7 +135,8 @@ Token Lexer::token()
     tok.debug.col = _m_col;
     tok.debug.pos = _m_pos;
 
-    if(!_m_good || _m_in.eof()) return tok;
+    if(!_m_good || _m_in.eof())
+        return tok;
 
     for(auto it = _m_rules.begin(); it != _m_rules.end(); ++it)
     {
