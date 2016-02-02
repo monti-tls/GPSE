@@ -139,17 +139,17 @@ Token Lexer::token()
         return tok;
 
     for(auto it = _m_rules.begin(); it != _m_rules.end(); ++it)
-    {
-        if(it->predicate(hint()))
         {
-            tok = it->get(this);
-            tok.debug.line = _m_line;
-            tok.debug.col = _m_col;
-            tok.debug.pos = _m_pos;
-            skipWs();
-            return tok;
+            if(it->predicate(hint()))
+            {
+                tok = it->get(this);
+                tok.debug.line = _m_line;
+                tok.debug.col = _m_col;
+                tok.debug.pos = _m_pos;
+                skipWs();
+                return tok;
+            }
         }
-    }
 
     _m_good = false;
     tok.which = Token::Bad;

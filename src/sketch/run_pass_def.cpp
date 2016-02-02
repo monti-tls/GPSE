@@ -61,15 +61,8 @@ namespace gpse
                         arg_values.push_back(val);
                     }
 
-                    // Save the old scope layer (containing arguments and locals)
-                    core::ScopeLayer* old_layer = fun_body->scopeLayer();
-                    // Push a fresh one
-                    fun_body->setScopeLayer(old_layer->clone());
-
-                    /*** HUGE TODO:
-                     ***    -> need to change ALL scope layers for
-                     ***       ALL child nodes of the function body, including sub-scopes :-(
-                     ***/
+                    // Push stack frame
+                    fun_body->scopeLayer()->preserve();
 
                     // Set up argument values
                     std::vector<core::Some>::iterator arg_val_it = arg_values.begin();
@@ -78,17 +71,13 @@ namespace gpse
                         // Retrieve the reference to the argument
                         core::Variable& var = variable_ref(fun_body, arg);
                         var.setValue(*arg_val_it++);
-
-                        std::cout << var.name() << "@" << &var << std::endl;
-                        std::cout << var.value().as<int>() << std::endl;
                     }
 
                     // Pass over function body
                     pass->pass(fun_body->children()[0]);
 
                     // Restore scope layer
-                    delete fun_body->scopeLayer();
-                    fun_body->setScopeLayer(old_layer);
+                    fun_body->scopeLayer()->restore();
                 };
 
                 pass.addOperator<FUNCTION_CALL_NODE, FunctionCallNode>(rule);

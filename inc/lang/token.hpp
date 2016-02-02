@@ -14,6 +14,7 @@ namespace gpse
             {
                 Bad,
                 Eof,
+                None, // used for comments
                 Good // first good token number
             };
 

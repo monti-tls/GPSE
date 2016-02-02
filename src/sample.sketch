@@ -13,7 +13,7 @@ fun factorial(int n) -> int
 	}
 	else
 	{
-		return n * factorial(n - 1);
+		return factorial(n - 1) * n;
 	}
 }
 

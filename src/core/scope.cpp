@@ -6,6 +6,7 @@ using namespace core;
 ScopeLayer::ScopeLayer(ScopeLayer* parent)
     : _m_parent(parent)
 {
+    _m_content.push(std::map<std::string, Symbol>());
 }
 
 ScopeLayer::~ScopeLayer()
@@ -38,7 +39,7 @@ std::vector<ScopeLayer*> const& ScopeLayer::children() const
 
 void ScopeLayer::addElement(std::string const& name, Symbol const& element)
 {
-    _m_content[name] = element;
+    _m_content.top()[name] = element;
 }
 
 bool ScopeLayer::find(std::string const& name, Symbol* element)
@@ -61,8 +62,8 @@ bool ScopeLayer::findInScope(std::string const& name, Symbol* element)
 
 Symbol* ScopeLayer::findRef(std::string const& name)
 {
-    auto it = _m_content.find(name);
-    if(it == _m_content.end())
+    auto it = _m_content.top().find(name);
+    if(it == _m_content.top().end())
     {
         if(_m_parent)
         {
@@ -77,8 +78,8 @@ Symbol* ScopeLayer::findRef(std::string const& name)
 
 Symbol* ScopeLayer::findRefInScope(std::string const& name)
 {
-    auto it = _m_content.find(name);
-    if(it != _m_content.end())
+    auto it = _m_content.top().find(name);
+    if(it != _m_content.top().end())
     {
         return &it->second;
     }
@@ -86,19 +87,14 @@ Symbol* ScopeLayer::findRefInScope(std::string const& name)
     return nullptr;
 }
 
-ScopeLayer* ScopeLayer::clone() const
+void ScopeLayer::preserve()
 {
-    ScopeLayer* cloned = new ScopeLayer(parent());
-    cloned->_m_content = _m_content;
+    _m_content.push(_m_content.top());
+}
 
-    for(auto child : _m_children)
-    {
-        ScopeLayer* cloned_child = child->clone();
-        cloned_child->_m_parent = cloned;
-        cloned->_m_children.push_back(cloned_child);
-    }
-
-    return cloned;
+void ScopeLayer::restore()
+{
+    _m_content.pop();
 }
 
 Scope::Scope()

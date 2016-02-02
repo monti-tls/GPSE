@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <map>
+#include <stack>
 
 namespace gpse
 {
@@ -28,12 +29,14 @@ namespace gpse
             Symbol* findRef(std::string const& name);
             Symbol* findRefInScope(std::string const& name);
 
-            ScopeLayer* clone() const;
+            void preserve();
+            void restore();
 
         private:
             ScopeLayer* _m_parent;
             std::vector<ScopeLayer*> _m_children;
-            std::map<std::string, Symbol> _m_content;
+
+            std::stack<std::map<std::string, Symbol>> _m_content;
         };
 
         class Scope
