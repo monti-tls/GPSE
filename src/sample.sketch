@@ -15,4 +15,5 @@ fun factorial(int n) -> int
 	}
 }
 
-factorial(5);
+__trace__((string) factorial(5));
+__trace__("\n");

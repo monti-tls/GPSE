@@ -74,14 +74,13 @@ Node* Parser::parseRaw(std::string const& grammar)
     }
 
     Node* node = it->second.get(this);
-
-    std::vector<Node*> to_fix(1, node);
     if(node)
     {
         node->setParser(this);
         if(!node->scopeLayer())
             node->setScopeLayer(&scope()->layer());
     }
+
     return node;
 }
 

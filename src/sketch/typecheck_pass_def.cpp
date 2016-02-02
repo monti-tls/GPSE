@@ -192,7 +192,7 @@ namespace gpse
                 auto rule = [](lang::TreePass* pass, lang::Node*& node, ReturnStatementNode* stat)
                 {
                     core::Symbol self;
-                    if(!node->scopeLayer()->findInScope("self", &self))
+                    if(!node->scopeLayer()->find("self", &self))
                         stat->error("return statement not in function !?");
 
                     core::Type ltp = self.function().prototype().ret();

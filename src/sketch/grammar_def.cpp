@@ -698,6 +698,8 @@ namespace gpse
                         return nullptr;
                     }
 
+                    p->scope()->down();
+
                     if(!p->eat(LCURLY, tok))
                     {
                         p->error("expected `{'");
@@ -718,6 +720,8 @@ namespace gpse
 
                     lang::Node* node = new IfBlockNode(condition, block);
                     node->setToken(s_tok);
+                    node->setScopeLayer(&p->scope()->layer());
+                    p->scope()->up();
 
                     return node;
                 };
@@ -760,6 +764,8 @@ namespace gpse
                         return nullptr;
                     }
 
+                    p->scope()->down();
+
                     if(!p->eat(LCURLY, tok))
                     {
                         p->error("expected `{'");
@@ -780,6 +786,8 @@ namespace gpse
 
                     lang::Node* node = new ElifBlockNode(condition, block);
                     node->setToken(s_tok);
+                    node->setScopeLayer(&p->scope()->layer());
+                    p->scope()->up();
 
                     return node;
                 };
@@ -804,6 +812,8 @@ namespace gpse
                         return nullptr;
                     }
 
+                    p->scope()->down();
+
                     if(!p->eat(LCURLY, tok))
                     {
                         p->error("expected `{'");
@@ -824,6 +834,8 @@ namespace gpse
 
                     lang::Node* node = new ElseBlockNode(block);
                     node->setToken(s_tok);
+                    node->setScopeLayer(&p->scope()->layer());
+                    p->scope()->up();
 
                     return node;
                 };
