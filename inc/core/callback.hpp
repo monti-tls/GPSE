@@ -82,6 +82,7 @@ namespace gpse
                 return core::Type::Boolean;
             }
 
+            //! The abstract base class for C++ callbacks
             class AbstractCallback
             {
             public:
@@ -92,14 +93,28 @@ namespace gpse
                 {
                 }
 
+                //! This abstract function effectively invokes the callback
+                //! \param args The argument vector, dynamically casted when called
+                //! \return The eventual return value of the callback (empty gpse::core::Some
+                //!         if it returns void)
                 virtual core::Some call(std::vector<core::Some> const& args) = 0;
+
+                //! This abstract function returns the prototype of the callback
+                //! \return The prototype instance of the class
                 virtual core::Prototype prototype() const = 0;
             };
 
+            //! This class implements basic callback primitives, like
+            //!   generating the prototype from the variadic template
+            //!   C++ function signature, and unpacking the argument vector
+            //!   sequence to a casted tuple.
             template <typename TRet, typename... TArgs>
             class CallbackBase : public AbstractCallback
             {
             public:
+                //! Construct a callback base containing a standard
+                //!   function wrapper
+                //! \param fun The function to integrate in the callback system
                 CallbackBase(std::function<TRet(TArgs...)> const& fun)
                     : _m_fun(fun)
                 {
@@ -109,6 +124,10 @@ namespace gpse
                 {
                 }
 
+                //! This function returns the generated function prototype
+                //!   reflecting this callback's C++ signature.
+                //! Non-scalar types are viewed as gpse::core::Type::Opaque types.
+                //! \return The generated prototype
                 core::Prototype prototype() const
                 {
                     return core::Prototype(whichType<TRet>(), _M_argumentTypes((TArgs*)nullptr...));
@@ -146,12 +165,18 @@ namespace gpse
                 std::function<TRet(TArgs...)> _m_fun;
             };
 
+            //! This class implements a callback for
+            //!   functions not returning void.
             template <typename TRet, typename... TArgs>
             class CallbackImpl : public CallbackBase<TRet, TArgs...>
             {
             public:
                 using CallbackBase<TRet, TArgs...>::CallbackBase;
 
+                //! Using gpse::core::detail::apply(), this function effectively calls
+                //!   the enclosed function using the generated casted tuple as arguments.
+                //! \param args The wrapped arguments vector
+                //! \return The wrapped function's return value
                 core::Some call(std::vector<core::Some> const& args)
                 {
                     std::tuple<TArgs...> tp = this->_M_call(args.begin(), (TArgs*)nullptr...);
@@ -159,12 +184,18 @@ namespace gpse
                 }
             };
 
+            //! This class implements a callback for
+            //!   functions returning void.
             template <typename... TArgs>
             class CallbackImpl<void, TArgs...> : public CallbackBase<void, TArgs...>
             {
             public:
                 using CallbackBase<void, TArgs...>::CallbackBase;
 
+                //! Using gpse::core::detail::apply(), this function effectively calls
+                //!   the enclosed function using the generated casted tuple as arguments.
+                //! \param args The wrapped arguments vector
+                //! \return An empty value
                 core::Some call(std::vector<core::Some> const& args)
                 {
                     std::tuple<TArgs...> tp = this->_M_call(args.begin(), (TArgs*)nullptr...);
@@ -175,9 +206,14 @@ namespace gpse
             };
         }
 
+        //! This is the callback structure viewed as a symbol,
+        //!   like gpse::core::Function or gpse::core::Variable.
         class Callback
         {
         public:
+            //! Create a callback from a function pointer.
+            //! \param fun The function pointer to enclose in this callback structure
+            //! \param name The name of the callback symbol
             template <typename TRet, typename... TArgs>
             Callback(std::function<TRet(TArgs...)> const& fun, std::string const& name)
                 : _m_impl(new detail::CallbackImpl<TRet, TArgs...>(fun))
@@ -189,8 +225,19 @@ namespace gpse
             {
             }
 
+            //! Invoke this callback object using a vector of
+            //!   wrapped values as arguments
+            //! \param args The argument vector as wrapped values
+            //! \return The wrapped return value of the call,
+            //!         empty if it returns void
             core::Some call(std::vector<core::Some> const& args) const;
+
+            //! Get the prototype of this callback
+            //! \return The prototype of this callback
             core::Prototype prototype() const;
+
+            //! Get the name of this callback symbol
+            //! \return The name of this callback symbol
             std::string const& name() const;
 
         private:
