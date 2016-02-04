@@ -58,7 +58,7 @@ clean:
 format: $(C_FMT) $(H_FMT)
 
 # Dependencies
--include $(C_DEPS)
+-include $(C_DEP)
 
 # Translation
 $(BINARY): $(C_OBJ)
