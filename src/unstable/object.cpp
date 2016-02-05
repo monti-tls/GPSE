@@ -43,3 +43,21 @@ Object Object::invoke(std::vector<Object> const& args) const
 
 	throw std::runtime_error("attempt to invoke a non-callable object");
 }
+
+Object Object::operator()(std::vector<Object> const& args) const
+{ return member("__call__").invoke(args); }
+
+Object Object::operator+(Object const& other) const
+{ return member("__add__").invoke({*this, other}); }
+
+Object Object::operator-(Object const& other) const
+{ return member("__sub__").invoke({*this, other}); }
+
+Object Object::operator*(Object const& other) const
+{ return member("__mul__").invoke({*this, other}); }
+
+Object Object::operator/(Object const& other) const
+{ return member("__div__").invoke({*this, other}); }
+
+Object Object::operator%(Object const& other) const
+{ return member("__mod__").invoke({*this, other}); }

@@ -3,8 +3,9 @@
 #include "unstable/callback.hpp"
 #include "unstable/objectfactory.hpp"
 
-// be careful to include this at the very end
+// be careful to include those at the very end
 #include "unstable/callback_impl.hpp"
+#include "unstable/object_impl.hpp"
 
 #include <string>
 #include <iostream>
@@ -29,8 +30,8 @@ Object int_constructor(int const& value)
 {
     Object obj(Object::Kind::Scalar, Some(value));
 
-    obj.member("__add__") = ObjectFactory::build(&int_add);
-    obj.member("__sub__") = ObjectFactory::build(&int_sub);
+    obj.member("__add__") = int_add;
+    obj.member("__sub__") = int_sub;
 
     return obj;
 }
@@ -41,16 +42,16 @@ void yolo()
 int main()
 {
     Object obj(Object::Kind::Scalar);
-    obj.member("__call__") = ObjectFactory::build(&yolo);
-    obj.invoke({});
+    obj.member("__call__") = yolo;
+    obj();
 
     ObjectFactory::registerType<Object>(&Object_constructor);
     ObjectFactory::registerType<int>(&int_constructor);
 
-    Object a = ObjectFactory::build(123);
-    Object b = ObjectFactory::build(321);
+    Object a = 123;
+    Object b = 321;
 
-    std::cout << a.member("__add__").invoke({a, b}).unwrap<int>() << std::endl;
+    std::cout << (a + b).unwrap<int>() << std::endl;
 
     return 0;
 }

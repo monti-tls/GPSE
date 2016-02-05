@@ -20,6 +20,12 @@ namespace unstable
         };
 
     public:
+        template <typename T>
+        Object(T const& value);
+
+        template <typename TRet, typename... TArgs>
+        Object(TRet(*function_ptr)(TArgs...));
+
         Object(Kind kind = Kind::Nil, Some meta = Some());
         ~Object();
 
@@ -31,28 +37,17 @@ namespace unstable
         Object invoke(std::vector<Object> const& args) const;
 
         template <typename T>
-        T& unwrap()
-        {
-            if (m_kind != Kind::Scalar)
-                throw std::runtime_error("attempt to unwrap a non-scalar object");
-
-            if (!m_meta.is<T>())
-                throw std::runtime_error("attempt to unwrap a object of incompatible type");
-
-            return m_meta.as<T>();
-        }
+        T& unwrap();
 
         template <typename T>
-        T const& unwrap() const
-        {
-            if (m_kind != Kind::Scalar)
-                throw std::runtime_error("attempt to unwrap a non-scalar object");
+        T const& unwrap() const;
 
-            if (!m_meta.is<T>())
-                throw std::runtime_error("attempt to unwrap a object of incompatible type");
-
-            return m_meta.as<T>();
-        }
+        Object operator()(std::vector<Object> const& args = {}) const;
+        Object operator+(Object const& other) const;
+        Object operator-(Object const& other) const;
+        Object operator*(Object const& other) const;
+        Object operator/(Object const& other) const;
+        Object operator%(Object const& other) const;
 
     public:
         static Object Nil;
