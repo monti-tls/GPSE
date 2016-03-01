@@ -1,7 +1,7 @@
-#include "unstable/object.hpp"
-#include "unstable/callable.hpp"
+#include "core/object.hpp"
+#include "core/callable.hpp"
 
-using namespace unstable;
+using namespace core;
 
 Object Object::Nil = Object();
 

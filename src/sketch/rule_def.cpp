@@ -1,6 +1,5 @@
 #include "sketch/rule_def.hpp"
-#include "core/scope.hpp"
-#include "core/type.hpp"
+#include "core/namespace.hpp"
 
 namespace gpse
 {
@@ -20,12 +19,18 @@ namespace gpse
             lexer.rules().push_back(lang::Rule::single(TIMES, '*'));
             lexer.rules().push_back(lang::Rule::single(SLASH, '/'));
             lexer.rules().push_back(lang::Rule::single(PLUS, '+'));
+            lexer.rules().push_back(lang::Rule::single(MINUS, '-'));
             lexer.rules().push_back(lang::Rule::single(AND, "&&"));
             lexer.rules().push_back(lang::Rule::single(OR, "||"));
             lexer.rules().push_back(lang::Rule::single(SEMICOLON, ';'));
             lexer.rules().push_back(lang::Rule::single(COMMA, ','));
             lexer.rules().push_back(lang::Rule::single(LCURLY, '{'));
             lexer.rules().push_back(lang::Rule::single(RCURLY, '}'));
+
+            lexer.rules().push_back(lang::Rule::doubled(NOT, NEQ, '!', '='));
+            lexer.rules().push_back(lang::Rule::doubled(LT, LTE, '<', '='));
+            lexer.rules().push_back(lang::Rule::doubled(GT, GTE, '>', '='));
+            lexer.rules().push_back(lang::Rule::doubled(EQUALS, EQ, '=', '='));
 
             std::map<std::string, int> keywords;
             keywords["true"] = K_TRUE;
@@ -36,120 +41,6 @@ namespace gpse
             keywords["elif"] = K_ELIF;
             keywords["else"] = K_ELSE;
             keywords["while"] = K_WHILE;
-
-            // MINUS / RETURNS
-            {
-                auto pred = [](int h) -> bool
-                {
-                    return h == '-';
-                };
-
-                auto rule = [](lang::Lexer* l) -> lang::Token
-                {
-                    l->eat('-');
-
-                    if(l->hint() == '>')
-                    {
-                        l->eat('>');
-                        return lang::Token(RETURNS);
-                    }
-
-                    return lang::Token(MINUS);
-                };
-
-                lexer.rules().push_back(lang::Rule(pred, rule));
-            }
-
-            // NEQ / NOT
-            {
-                auto pred = [](int h) -> bool
-                {
-                    return h == '!';
-                };
-
-                auto rule = [](lang::Lexer* l) -> lang::Token
-                {
-                    l->eat('!');
-
-                    if(l->hint() == '=')
-                    {
-                        l->eat('=');
-                        return lang::Token(NEQ);
-                    }
-
-                    return lang::Token(NOT);
-                };
-
-                lexer.rules().push_back(lang::Rule(pred, rule));
-            }
-
-            // LT / LTE
-            {
-                auto pred = [](int h) -> bool
-                {
-                    return h == '<';
-                };
-
-                auto rule = [](lang::Lexer* l) -> lang::Token
-                {
-                    l->eat('<');
-
-                    if(l->hint() == '=')
-                    {
-                        l->eat('=');
-                        return lang::Token(LTE);
-                    }
-
-                    return lang::Token(LT);
-                };
-
-                lexer.rules().push_back(lang::Rule(pred, rule));
-            }
-
-            // GT / GTE
-            {
-                auto pred = [](int h) -> bool
-                {
-                    return h == '>';
-                };
-                auto rule = [](lang::Lexer* l) -> lang::Token
-                {
-                    l->eat('>');
-
-                    if(l->hint() == '=')
-                    {
-                        l->eat('=');
-                        return lang::Token(GTE);
-                    }
-
-                    return lang::Token(GT);
-                };
-
-                lexer.rules().push_back(lang::Rule(pred, rule));
-            }
-
-            // EQ / EQUALS
-            {
-                auto pred = [](int h) -> bool
-                {
-                    return h == '=';
-                };
-
-                auto rule = [](lang::Lexer* l) -> lang::Token
-                {
-                    l->eat('=');
-
-                    if(l->hint() == '=')
-                    {
-                        l->eat('=');
-                        return lang::Token(EQ);
-                    }
-
-                    return lang::Token(EQUALS);
-                };
-
-                lexer.rules().push_back(lang::Rule(pred, rule));
-            }
 
             // NUMBER
             {
@@ -206,7 +97,7 @@ namespace gpse
                 lexer.rules().push_back(lang::Rule(pred, rule));
             }
 
-            // IDENT, VARIABLENAME, FUNCTIONNAME, CALLBACKNAME, TYPENAME and K_*
+            // IDENT, SYMBOL and K_*
             {
                 auto pred = [](int h) -> bool
                 {
@@ -226,38 +117,22 @@ namespace gpse
                     {
                         temp += l->get();
                     }
-                    auto kw_it = keywords.find(temp);
 
                     // if the identifier is a valid keyword
+                    auto kw_it = keywords.find(temp);
                     if(kw_it != keywords.end())
                     {
                         return lang::Token(kw_it->second);
                     }
-                    // else, try to find out if it is a type, variable or function name
-                    else
+
+                    // if not, try to find out if it is currently defined in the current namespace
+                    core::Symbol* sym;
+                    if (l->ns().find(temp, &sym))
                     {
-                        core::Symbol sym;
-                        if(l->scope()->layer().find(temp, &sym))
-                        {
-                            if(sym.isVariable())
-                            {
-                                return lang::Token(VARIABLENAME, sym.variable());
-                            }
-                            else if(sym.isType())
-                            {
-                                return lang::Token(TYPENAME, sym.type());
-                            }
-                            else if(sym.isFunction())
-                            {
-                                return lang::Token(FUNCTIONNAME, sym.function());
-                            }
-                            else if(sym.isCallback())
-                            {
-                                return lang::Token(CALLBACKNAME, sym.callback());
-                            }
-                        }
+                        return lang::Token(SYMBOL, sym);
                     }
 
+                    // otherwise, it is a new identifier
                     return lang::Token(IDENT, temp);
                 };
 

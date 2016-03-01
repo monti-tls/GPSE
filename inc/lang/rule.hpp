@@ -26,10 +26,11 @@ namespace gpse
 
             static Rule single(int which, char c);
             static Rule single(int which, std::string const& str);
+            static Rule doubled(int which_first, int which_second, char first, char second);
 
         private:
-            pred_t _m_predicate;
-            get_t _m_get;
+            pred_t m_predicate;
+            get_t m_get;
         };
     }
 }

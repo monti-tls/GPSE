@@ -1,57 +1,36 @@
-#include "unstable/object.hpp"
-#include "unstable/callable.hpp"
-#include "unstable/callback.hpp"
-#include "unstable/objectfactory.hpp"
-
-// be careful to include those at the very end
-#include "unstable/callback_impl.hpp"
-#include "unstable/object_impl.hpp"
+#include "core/object.hpp"
+#include "lang/lexer.hpp"
+#include "sketch/rule_def.hpp"
 
 #include <string>
-#include <iostream>
-#include <functional>
+#include <sstream>
+#include <fstream>
 
-using namespace unstable;
+using namespace gpse;
 
-// A class <=> a constructor, setting up the object with the appropriate methods
-// methods <=> a function, taking at least the 'this' argument
-// object : can be callable or scalar
-
-Object Object_constructor(Object const& value)
-{ return value; }
-
-int int_add(int a, int b)
-{ return a + b; }
-
-int int_sub(int a, int b)
-{ return a - b; }
-
-Object int_constructor(int const& value)
+std::string tok2str(lang::Token tok)
 {
-    Object obj(Object::Kind::Scalar, Some(value));
+	const char* arr[] =
+	{ "<BAD>", "<EOF>", "<NONE>", "LPAR", "RPAR", "TIMES", "SLASH", "PLUS", "MINUS", "AND", "OR", "NOT", "LT", "LTE", "GT", "GTE", "EQ", "EQUALS", "SEMICOLON", "COMMA", "LCURLY", "RCURLY", "NEQ", "NUMBER", "STRING", "K_TRUE", "K_FALSE", "K_RETURN", "K_FUN", "K_IF", "K_ELIF", "K_ELSE", "K_WHILE", "SYMBOL", "IDENT" };
 
-    obj.member("__add__") = int_add;
-    obj.member("__sub__") = int_sub;
-
-    return obj;
+	return arr[tok.which];
 }
-
-void yolo()
-{ std::cout << "yolo !" << std::endl; }
 
 int main()
 {
-    Object obj(Object::Kind::Scalar);
-    obj.member("__call__") = yolo;
-    obj();
+    std::ifstream file("test");
 
-    ObjectFactory::registerType<Object>(&Object_constructor);
-    ObjectFactory::registerType<int>(&int_constructor);
+    core::Namespace ns;
+    lang::Lexer lex(file, ns);
 
-    Object a = 123;
-    Object b = 321;
+    sketch::setupLexer(lex);
 
-    std::cout << (a + b).unwrap<int>() << std::endl;
+    lang::Token tok;
+    do
+    {
+    	tok = lex.token();
+    	std::cout << tok2str(tok) << std::endl;
+    } while (tok != lang::Token::Bad && tok != lang::Token::Eof);
 
     return 0;
 }

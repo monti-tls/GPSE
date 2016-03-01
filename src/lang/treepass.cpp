@@ -4,9 +4,9 @@ using namespace gpse;
 using namespace lang;
 
 TreePass::TreePass()
-    : _m_defaultOp()
+    : m_defaultOp()
 {
-    _m_defaultOp = [=](Node*& node)
+    m_defaultOp = [=](Node*& node)
     {
         for(Node*& child : node->children())
         {
@@ -21,27 +21,27 @@ TreePass::~TreePass()
 
 std::map<std::string, TreePass>& TreePass::subPasses()
 {
-    return _m_subpasses;
+    return m_subpasses;
 }
 
 std::map<std::string, TreePass> const& TreePass::subPasses() const
 {
-    return _m_subpasses;
+    return m_subpasses;
 }
 
 core::Some& TreePass::storage()
 {
-    return _m_storage;
+    return m_storage;
 }
 
 core::Some const& TreePass::storage() const
 {
-    return _m_storage;
+    return m_storage;
 }
 
 void TreePass::setDefaultOperator(std::function<void(TreePass*, Node*&)> const& op)
 {
-    _m_defaultOp = [=](Node*& node)
+    m_defaultOp = [=](Node*& node)
     {
         op(this, node);
     };
@@ -49,13 +49,13 @@ void TreePass::setDefaultOperator(std::function<void(TreePass*, Node*&)> const& 
 
 void TreePass::pass(Node*& node)
 {
-    auto it = _m_ops.find(node->which());
-    if(it != _m_ops.end())
+    auto it = m_ops.find(node->which());
+    if(it != m_ops.end())
     {
         (it->second)(node);
     }
     else
     {
-        _m_defaultOp(node);
+        m_defaultOp(node);
     }
 }

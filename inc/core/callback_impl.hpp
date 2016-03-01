@@ -14,28 +14,27 @@
  * along with gpse.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __GPSE_CORE_SYMBOL_H__
-#define __GPSE_CORE_SYMBOL_H__
-
-#include "core/object.hpp"
-#include <string>
+#ifndef __GPSE_CORE_CALLBACK_IMPL_H__
+#define __GPSE_CORE_CALLBACK_IMPL_H__
 
 namespace core
 {
-    class Symbol
+    template <typename TRet, typename... TArgs>
+    Object CallbackImpl<TRet, TArgs...>::invoke(std::vector<Object> const& args)
     {
-    public:
-        Symbol(std::string const& name = "?");
+        std::tuple<TArgs...> tp = this->M_buildTuple(args.begin(), (TArgs*)nullptr...);
 
-        std::string const& name() const;
-        void bind(Object* target);
-        bool bound() const;
-        Object* target() const;
+        return ObjectFactory::build(apply(this->m_fun, tp));
+    }
 
-    private:
-        std::string m_name;
-        Object* m_target;
-    };
+    template <typename... TArgs>
+    Object CallbackImpl<void, TArgs...>::invoke(std::vector<Object> const& args)
+    {
+        std::tuple<TArgs...> tp = this->M_buildTuple(args.begin(), (TArgs*)nullptr...);
+        apply(this->m_fun, tp);
+
+        return Object::Nil;
+    }
 }
 
-#endif // __GPSE_CORE_SYMBOL_H__
+#endif // __GPSE_CORE_CALLBACK_IMPL_H__

@@ -14,28 +14,35 @@
  * along with gpse.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __GPSE_CORE_SYMBOL_H__
-#define __GPSE_CORE_SYMBOL_H__
+#ifndef __GPSE_CORE_NAMESPACE_LAYER_H__
+#define __GPSE_CORE_NAMESPACE_LAYER_H__
 
-#include "core/object.hpp"
+#include "core/symbol.hpp"
+
 #include <string>
+#include <map>
+#include <vector>
 
 namespace core
 {
-    class Symbol
+    class NamespaceLayer
     {
     public:
-        Symbol(std::string const& name = "?");
+        NamespaceLayer(NamespaceLayer* parent = nullptr);
+        ~NamespaceLayer();
 
-        std::string const& name() const;
-        void bind(Object* target);
-        bool bound() const;
-        Object* target() const;
+        void set(std::string const& name);
+		bool find(std::string const& name, Symbol** found = nullptr);
+        bool findLocal(std::string const& name, Symbol** found = nullptr);
+
+        NamespaceLayer* addChild();
+        NamespaceLayer* parent() const;
 
     private:
-        std::string m_name;
-        Object* m_target;
+    	NamespaceLayer* m_parent;
+    	std::map<std::string, Symbol> m_symbols;
+    	std::vector<NamespaceLayer> m_children;
     };
 }
 
-#endif // __GPSE_CORE_SYMBOL_H__
+#endif // __GPSE_CORE_NAMESPACE_LAYER_H__

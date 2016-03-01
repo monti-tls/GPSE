@@ -4,7 +4,6 @@
 #include "lang/lexer.hpp"
 #include "lang/node.hpp"
 #include "lang/grammar.hpp"
-#include "core/scope.hpp"
 
 #include <map>
 
@@ -20,7 +19,6 @@ namespace gpse
 
             std::map<std::string, Grammar>& grammars();
             std::map<std::string, Grammar> const& grammars() const;
-            core::Scope* scope() const;
 
             bool good() const;
             void reset();
@@ -38,14 +36,14 @@ namespace gpse
             }
 
         private:
-            Token _M_advance();
+            Token m_advance();
 
         private:
-            Lexer& _m_lexer;
-            Token _m_current;
-            Token _m_next;
-            bool _m_good;
-            std::map<std::string, Grammar> _m_grammars;
+            Lexer& m_lexer;
+            Token m_current;
+            Token m_next;
+            bool m_good;
+            std::map<std::string, Grammar> m_grammars;
         };
     }
 }

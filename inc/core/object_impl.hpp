@@ -1,10 +1,26 @@
-#ifndef __GPSE_UNSTABLE_OBJECT_IMPL_H__
-#define __GPSE_UNSTABLE_OBJECT_IMPL_H__
+/*  This file is part of gpse.
+ *
+ * gpse is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * gpse is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with gpse.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "unstable/object.hpp"
-#include "unstable/objectfactory.hpp"
+#ifndef __GPSE_CORE_OBJECT_IMPL_H__
+#define __GPSE_CORE_OBJECT_IMPL_H__
 
-namespace unstable
+#include "core/object.hpp"
+#include "core/objectfactory.hpp"
+
+namespace core
 {
 	template <typename T>
 	Object::Object(T const& value)
@@ -39,4 +55,4 @@ namespace unstable
     }
 }
 
-#endif // __GPSE_UNSTABLE_OBJECT_IMPL_H__
+#endif // __GPSE_CORE_OBJECT_IMPL_H__

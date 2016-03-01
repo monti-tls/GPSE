@@ -32,8 +32,8 @@ namespace gpse
             Node* get(Parser* parser);
 
         private:
-            pred_t _m_predicate;
-            get_t _m_get;
+            pred_t m_predicate;
+            get_t m_get;
         };
     }
 }

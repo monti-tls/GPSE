@@ -1,10 +1,9 @@
 #ifndef __GPSE_LANG_LEXER_H__
 #define __GPSE_LANG_LEXER_H__
 
-#include "core/some.hpp"
 #include "lang/token.hpp"
 #include "lang/rule.hpp"
-#include "core/scope.hpp"
+#include "core/namespace.hpp"
 
 #include <iostream>
 #include <string>
@@ -21,14 +20,14 @@ namespace gpse
             typedef std::function<bool(int)> wsrule_t;
 
         public:
-            Lexer(std::istream& in, core::Scope* scope = nullptr);
+            Lexer(std::istream& in, core::Namespace& ns);
             ~Lexer();
 
+            core::Namespace& ns() const;
             wsrule_t& wsRule();
             wsrule_t const& wsRule() const;
             std::vector<Rule>& rules();
             std::vector<Rule> const& rules() const;
-            core::Scope* scope() const;
 
             bool good() const;
             void reset();
@@ -42,17 +41,17 @@ namespace gpse
             Token token();
 
         private:
-            std::string _M_wholeLine(Token const& tok) const;
+            std::string M_wholeLine(Token const& tok) const;
 
         private:
-            std::istream& _m_in;
-            core::Scope* _m_scope;
-            int _m_line;
-            int _m_col;
-            int _m_pos;
-            bool _m_good;
-            wsrule_t _m_wsRule;
-            std::vector<Rule> _m_rules;
+            std::istream& m_in;
+            core::Namespace& m_ns;
+            int m_line;
+            int m_col;
+            int m_pos;
+            bool m_good;
+            wsrule_t m_wsRule;
+            std::vector<Rule> m_rules;
         };
     }
 }

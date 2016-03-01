@@ -1,6 +1,6 @@
-#include "unstable/objectfactory.hpp"
+#include "core/objectfactory.hpp"
 
-namespace unstable
+namespace core
 {
     std::map<size_t, ObjectFactory::Constructor> ObjectFactory::m_constructors;
 }

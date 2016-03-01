@@ -2,10 +2,8 @@
 #define __SKETCH_AST_H__
 
 #include "lang/node.hpp"
-#include "core/type.hpp"
-#include "core/variable.hpp"
-#include "core/function.hpp"
-#include "core/literal.hpp"
+#include "core/object.hpp"
+#include "core/symbol.hpp"
 
 namespace gpse
 {
@@ -13,92 +11,57 @@ namespace gpse
     {
         enum
         {
-            LITERAL_NODE,
-            EXPRESSION_NODE,
-            VARIABLE_NODE,
-            FUNCTION_CALL_NODE,
-            CALLBACK_CALL_NODE,
-            CAST_NODE,
-            VARIABLE_DECL_NODE,
-            VARIABLE_ASSIGN_NODE,
-            RETURN_STATEMENT_NODE,
-            STATEMENT_BLOCK_NODE,
-            FUNCTION_DECLARATION_NODE,
-            IF_BLOCK_NODE,
-            ELIF_BLOCK_NODE,
-            ELSE_BLOCK_NODE,
-            CONDITIONAL_BLOCK_NODE,
-            WHILE_BLOCK_NODE,
+            EXPR_LITERAL_NODE,
+            EXPR_SYMBOL_NODE,
+            EXPR_NODE,
+
+            STMT_ASSIGN_NODE,
+            STMT_RETURN_NODE,
+            STMT_BLOCK_NODE,
+
+            DECL_VARIABLE_NODE,
+            /*DECL_FUNCTION_NODE,
+
+            BLOCK_IF_NODE,
+            BLOCK_ELIF_NODE,
+            BLOCK_ELSE_NODE,
+            BLOCK_CONDITIONAL_NODE,
+
+            BLOCK_WHILE_NODE,*/
+
             PROGRAM_NODE
         };
 
-        class LiteralNode : public lang::Node
+        class ExprLiteralNode : public lang::Node
         {
         public:
-            LiteralNode(core::Literal const& value, lang::Node* parent = nullptr);
-            ~LiteralNode();
+            ExprLiteralNode(core::Object const& value, lang::Node* parent = nullptr);
 
-            core::Literal const& value() const;
+            core::Object const& value() const;
 
         private:
-            core::Literal _m_value;
+            core::Object m_value;
         };
 
-        class VariableNode : public lang::Node
+        class ExprSymbolNode : public lang::Node
         {
         public:
-            VariableNode(core::Variable const& value, lang::Node* parent = nullptr);
-            ~VariableNode();
+            ExprSymbolNode(core::Symbol* symbol, lang::Node* parent = nullptr);
 
-            core::Variable const& value() const;
-
-        private:
-            core::Variable _m_value;
-        };
-
-        class FunctionCallNode : public lang::Node
-        {
-        public:
-            FunctionCallNode(core::Function const& value, lang::Node* parent = nullptr);
-            ~FunctionCallNode();
-
-            core::Function const& value() const;
+            core::Symbol* symbol() const;
 
         private:
-            core::Function _m_value;
+            core::Symbol*  m_symbol;
         };
 
-        class CallbackCallNode : public lang::Node
-        {
-        public:
-            CallbackCallNode(core::Callback const& value, lang::Node* parent = nullptr);
-            ~CallbackCallNode();
-
-            core::Callback const& value() const;
-
-        private:
-            core::Callback _m_value;
-        };
-
-        class CastNode : public lang::Node
-        {
-        public:
-            CastNode(core::Type const& to, lang::Node* expr, lang::Node* parent = nullptr);
-            ~CastNode();
-
-            core::Type const& to() const;
-
-        private:
-            core::Type _m_to;
-        };
-
-        class ExpressionNode : public lang::Node
+        class ExprNode : public lang::Node
         {
         public:
             enum class Unary
             {
                 Not,
-                Neg
+                Neg,
+                Call
             };
 
             enum class Binary
@@ -118,9 +81,8 @@ namespace gpse
             };
 
         public:
-            ExpressionNode(Unary what, lang::Node* expr, lang::Node* parent = nullptr);
-            ExpressionNode(Binary what, lang::Node* lhs, lang::Node* rhs, lang::Node* parent = nullptr);
-            ~ExpressionNode();
+            ExprNode(Unary what, lang::Node* expr, lang::Node* parent = nullptr);
+            ExprNode(Binary what, lang::Node* lhs, lang::Node* rhs, lang::Node* parent = nullptr);
 
             bool isUnary() const;
             bool isBinary() const;
@@ -128,105 +90,47 @@ namespace gpse
             Unary unaryOperation() const;
             Binary binaryOperation() const;
 
-        private:
-            Unary _m_unary;
-            Binary _m_binary;
-        };
-
-        class VariableDeclNode : public lang::Node
-        {
-        public:
-            VariableDeclNode(core::Variable const& variable, lang::Node* initialization = nullptr, lang::Node* parent = nullptr);
-            ~VariableDeclNode();
-
-            core::Variable const& variable() const;
+            ExprNode* lhs() const;
+            ExprNode* rhs() const;
 
         private:
-            core::Variable _m_variable;
+            Unary m_unary;
+            Binary m_binary;
         };
 
-        class VariableAssignNode : public lang::Node
+        class StmtAssignNode : public lang::Node
         {
         public:
-            VariableAssignNode(core::Variable const& variable, lang::Node* value, lang::Node* parent = nullptr);
-            ~VariableAssignNode();
+            StmtAssignNode(lang::Node* lvalue, lang::Node* rvalue, lang::Node* parent = nullptr);
 
-            core::Variable const& variable() const;
+            ExprNode* lvalue() const;
+            ExprNode* rvalue() const;
+        };
+
+        class StmtReturnNode : public lang::Node
+        {
+        public:
+            StmtReturnNode(lang::Node* value = nullptr, lang::Node* parent = nullptr);
+
+            ExprNode* value() const;
+        };
+
+        class StmtBlockNode : public lang::Node
+        {
+        public:
+            StmtBlockNode(lang::Node* parent = nullptr);
+        };
+
+        class DeclVariableNode : public lang::Node
+        {
+        public:
+            DeclVariableNode(core::Symbol* symbol, lang::Node* init = nullptr, lang::Node* parent = nullptr);
+
+            core::Symbol* symbol() const;
+            ExprNode* init() const;
 
         private:
-            core::Variable _m_variable;
-        };
-
-        class ReturnStatementNode : public lang::Node
-        {
-        public:
-            ReturnStatementNode(lang::Node* value = nullptr, lang::Node* parent = nullptr);
-            ~ReturnStatementNode();
-        };
-
-        class StatementBlockNode : public lang::Node
-        {
-        public:
-            StatementBlockNode(lang::Node* parent = nullptr);
-            ~StatementBlockNode();
-        };
-
-        class FunctionDeclarationNode : public lang::Node
-        {
-        public:
-            FunctionDeclarationNode(core::Function const& function, lang::Node* parent = nullptr);
-            ~FunctionDeclarationNode();
-
-            core::Function const& function() const;
-
-        private:
-            core::Function _m_function;
-        };
-
-        class IfBlockNode : public lang::Node
-        {
-        public:
-            IfBlockNode(lang::Node* condition, lang::Node* block, lang::Node* parent = nullptr);
-            ~IfBlockNode();
-
-            lang::Node*& condition();
-            lang::Node*& block();
-        };
-
-        class ElifBlockNode : public lang::Node
-        {
-        public:
-            ElifBlockNode(lang::Node* condition, lang::Node* block, lang::Node* parent = nullptr);
-            ~ElifBlockNode();
-
-            lang::Node*& condition();
-            lang::Node*& block();
-        };
-
-        class ElseBlockNode : public lang::Node
-        {
-        public:
-            ElseBlockNode(lang::Node* block, lang::Node* parent = nullptr);
-            ~ElseBlockNode();
-
-            lang::Node*& block();
-        };
-
-        class ConditionalBlockNode : public lang::Node
-        {
-        public:
-            ConditionalBlockNode(lang::Node* parent = nullptr);
-            ~ConditionalBlockNode();
-        };
-
-        class WhileBlockNode : public lang::Node
-        {
-        public:
-            WhileBlockNode(lang::Node* condition, lang::Node* block, lang::Node* parent = nullptr);
-            ~WhileBlockNode();
-
-            lang::Node*& condition();
-            lang::Node*& block();
+            core::Symbol* m_symbol;
         };
 
         class ProgramNode : public lang::Node

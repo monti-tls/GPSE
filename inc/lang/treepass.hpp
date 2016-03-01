@@ -24,7 +24,7 @@ namespace gpse
             template <int which, typename T>
             void addOperator(typename std::function<void(TreePass*, Node*&, T*)> const& op)
             {
-                _m_ops[which] = [=](Node*& node)
+                m_ops[which] = [=](Node*& node)
                 {
                     op(this, node, static_cast<T*>(node));
                 };
@@ -39,10 +39,10 @@ namespace gpse
             core::Some const& storage() const;
 
         private:
-            operator_t _m_defaultOp;
-            std::map<int, operator_t> _m_ops;
-            std::map<std::string, TreePass> _m_subpasses;
-            core::Some _m_storage;
+            operator_t m_defaultOp;
+            std::map<int, operator_t> m_ops;
+            std::map<std::string, TreePass> m_subpasses;
+            core::Some m_storage;
         };
     }
 }

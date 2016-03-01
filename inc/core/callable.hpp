@@ -1,15 +1,31 @@
-#ifndef __GPSE_UNSTABLE_CALLABLE_H__
-#define __GPSE_UNSTABLE_CALLABLE_H__
+/*  This file is part of gpse.
+ *
+ * gpse is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * gpse is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with gpse.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "unstable/some.hpp"
-#include "unstable/object.hpp"
-#include "unstable/callback.hpp"
+#ifndef __GPSE_CORE_CALLABLE_H__
+#define __GPSE_CORE_CALLABLE_H__
+
+#include "core/some.hpp"
+#include "core/object.hpp"
+#include "core/callback.hpp"
 
 #include <functional>
 #include <vector>
 #include <memory>
 
-namespace unstable
+namespace core
 {
     class Callable
     {
@@ -45,4 +61,4 @@ namespace unstable
     };
 }
 
-#endif // __GPSE_UNSTABLE_CALLABLE_H__
+#endif // __GPSE_CORE_CALLABLE_H__

@@ -6,13 +6,13 @@
 using namespace gpse;
 using namespace lang;
 
-Lexer::Lexer(std::istream& in, core::Scope* scope)
-    : _m_in(in)
-    , _m_scope(scope)
-    , _m_line(1)
-    , _m_col(1)
-    , _m_pos(_m_in.tellg())
-    , _m_good(true)
+Lexer::Lexer(std::istream& in, core::Namespace& ns)
+    : m_in(in)
+    , m_ns(ns)
+    , m_line(1)
+    , m_col(1)
+    , m_pos(m_in.tellg())
+    , m_good(true)
 {
 }
 
@@ -20,62 +20,60 @@ Lexer::~Lexer()
 {
 }
 
+core::Namespace& Lexer::ns() const
+{ return m_ns; }
+
 Lexer::wsrule_t& Lexer::wsRule()
 {
-    return _m_wsRule;
+    return m_wsRule;
 }
 
 Lexer::wsrule_t const& Lexer::wsRule() const
 {
-    return _m_wsRule;
+    return m_wsRule;
 }
 
 std::vector<Rule>& Lexer::rules()
 {
-    return _m_rules;
+    return m_rules;
 }
 
 std::vector<Rule> const& Lexer::rules() const
 {
-    return _m_rules;
-}
-
-core::Scope* Lexer::scope() const
-{
-    return _m_scope;
+    return m_rules;
 }
 
 bool Lexer::good() const
 {
-    return _m_good;
+    return m_good;
 }
 
 void Lexer::reset()
 {
-    _m_in.seekg(0, std::ios::beg);
-    _m_line = 1;
-    _m_col = 1;
-    _m_pos = _m_in.tellg();
-    _m_good = true;
+    m_in.seekg(0, std::ios::beg);
+    m_line = 1;
+    m_col = 1;
+    m_pos = m_in.tellg();
+    m_good = true;
 }
 
 int Lexer::hint()
 {
-    return _m_in.peek();
+    return m_in.peek();
 }
 
 int Lexer::get()
 {
-    int r = _m_in.get();
-    _m_pos = _m_in.tellg();
+    int r = m_in.get();
+    m_pos = m_in.tellg();
     if(r == '\n')
     {
-        ++_m_line;
-        _m_col = 1;
+        ++m_line;
+        m_col = 1;
     }
     else
     {
-        ++_m_col;
+        ++m_col;
     }
     return r;
 }
@@ -101,7 +99,7 @@ bool Lexer::eat(std::string const& str)
 
 void Lexer::skipWs()
 {
-    while(_m_wsRule(hint()))
+    while(m_wsRule(hint()))
     {
         get();
     }
@@ -112,7 +110,7 @@ void Lexer::error(Token const& tok, std::string const& message) const
     std::ostringstream ss;
 
     ss << "line " << tok.debug.line << ", col " << tok.debug.col << ": error: " << message << std::endl;
-    ss << "    " << _M_wholeLine(tok) << std::endl;
+    ss << "    " << M_wholeLine(tok) << std::endl;
     ss << "    ";
     for(int i = 1; i < tok.debug.col; ++i)
     {
@@ -129,44 +127,44 @@ Token Lexer::token()
     skipWs();
 
     Token tok = eofToken;
-    tok.debug.line = _m_line;
-    tok.debug.col = _m_col;
-    tok.debug.pos = _m_pos;
+    tok.debug.line = m_line;
+    tok.debug.col = m_col;
+    tok.debug.pos = m_pos;
 
-    if(!_m_good || _m_in.eof())
+    if(!m_good || m_in.eof())
         return tok;
 
-    for(auto it = _m_rules.begin(); it != _m_rules.end(); ++it)
+    for(auto it = m_rules.begin(); it != m_rules.end(); ++it)
     {
         if(it->predicate(hint()))
         {
             tok = it->get(this);
-            tok.debug.line = _m_line;
-            tok.debug.col = _m_col;
-            tok.debug.pos = _m_pos;
+            tok.debug.line = m_line;
+            tok.debug.col = m_col;
+            tok.debug.pos = m_pos;
             skipWs();
             return tok;
         }
     }
 
-    _m_good = false;
+    m_good = false;
     tok.which = Token::Bad;
     return tok;
 }
 
-std::string Lexer::_M_wholeLine(Token const& tok) const
+std::string Lexer::M_wholeLine(Token const& tok) const
 {
-    _m_in.clear();
-    int saved = _m_in.tellg();
-    _m_in.seekg(0, std::ios::beg);
+    m_in.clear();
+    int saved = m_in.tellg();
+    m_in.seekg(0, std::ios::beg);
 
     std::string line;
     for(int lineno = 0; lineno != tok.debug.line; ++lineno)
     {
-        std::getline(_m_in, line);
+        std::getline(m_in, line);
     }
 
-    _m_in.seekg(saved, std::ios::beg);
+    m_in.seekg(saved, std::ios::beg);
 
     return line;
 }

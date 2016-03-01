@@ -5,8 +5,8 @@ using namespace gpse;
 using namespace lang;
 
 Rule::Rule(Rule::pred_t predicate, Rule::get_t get)
-    : _m_predicate(predicate)
-    , _m_get(get)
+    : m_predicate(predicate)
+    , m_get(get)
 {
 }
 
@@ -16,12 +16,12 @@ Rule::~Rule()
 
 bool Rule::predicate(int hint)
 {
-    return _m_predicate(hint);
+    return m_predicate(hint);
 }
 
 Token Rule::get(Lexer* lexer)
 {
-    return _m_get(lexer);
+    return m_get(lexer);
 }
 
 Rule Rule::single(int which, char c)
@@ -49,5 +49,25 @@ Rule Rule::single(int which, std::string const& str)
                 {
                     l->eat(str);
                     return Token(which);
+                });
+}
+
+Rule Rule::doubled(int which_first, int which_second, char first, char second)
+{
+    return Rule([=](int h)
+                {
+                    return h == first;
+                },
+
+                [=](Lexer* l)
+                {
+                    l->eat(first);
+                    if (l->hint() == second)
+                    {
+                        l->eat(second);
+                        return Token(which_second);
+                    }
+
+                    return Token(which_first);
                 });
 }

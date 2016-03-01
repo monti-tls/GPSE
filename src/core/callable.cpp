@@ -1,6 +1,6 @@
-#include "unstable/callable.hpp"
+#include "core/callable.hpp"
 
-using namespace unstable;
+using namespace core;
 
 Callable::~Callable()
 {}

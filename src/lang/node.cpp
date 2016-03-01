@@ -7,16 +7,15 @@ using namespace gpse;
 using namespace lang;
 
 Node::Node(int which, Node* parent, Parser* parser)
-    : _m_which(which)
-    , _m_parser(parser)
-    , _m_parent(parent)
-    , _m_scopeLayer(nullptr)
+    : m_which(which)
+    , m_parser(parser)
+    , m_parent(parent)
 {
 }
 
 Node::~Node()
 {
-    for(auto it = _m_children.begin(); it != _m_children.end(); ++it)
+    for(auto it = m_children.begin(); it != m_children.end(); ++it)
     {
         delete *it;
     }
@@ -24,67 +23,57 @@ Node::~Node()
 
 int Node::which() const
 {
-    return _m_which;
+    return m_which;
 }
 
 void Node::setToken(Token const& token)
 {
-    _m_token = token;
+    m_token = token;
 }
 
 Token const& Node::token() const
 {
-    return _m_token;
+    return m_token;
 }
 
 void Node::setParser(Parser* parser)
 {
-    _m_parser = parser;
+    m_parser = parser;
 }
 
 Parser* Node::parser() const
 {
-    return _m_parser;
-}
-
-void Node::setScopeLayer(core::ScopeLayer* layer)
-{
-    _m_scopeLayer = layer;
-}
-
-core::ScopeLayer* Node::scopeLayer() const
-{
-    return _m_scopeLayer;
+    return m_parser;
 }
 
 Node* Node::parent()
 {
-    return _m_parent;
+    return m_parent;
 }
 
 void Node::setParent(Node* parent)
 {
-    _m_parent = parent;
+    m_parent = parent;
 }
 
 std::vector<Node*>& Node::children()
 {
-    return _m_children;
+    return m_children;
 }
 
 void Node::addChild(Node* child)
 {
     child->setParent(this);
-    _m_children.push_back(child);
+    m_children.push_back(child);
 }
 
 void Node::removeChild(Node* child)
 {
-    for(auto it = _m_children.begin(); it != _m_children.end(); ++it)
+    for(auto it = m_children.begin(); it != m_children.end(); ++it)
     {
         if(*it == child)
         {
-            _m_children.erase(it);
+            m_children.erase(it);
             break;
         }
     }
@@ -92,7 +81,7 @@ void Node::removeChild(Node* child)
 
 std::vector<Node*> const& Node::children() const
 {
-    return _m_children;
+    return m_children;
 }
 
 void Node::substituteChild(Node* oldChild, Node* newChild)
@@ -102,9 +91,9 @@ void Node::substituteChild(Node* oldChild, Node* newChild)
         return;
     }
 
-    auto it = std::find(_m_children.begin(), _m_children.end(), oldChild);
+    auto it = std::find(m_children.begin(), m_children.end(), oldChild);
 
-    if(it != _m_children.end())
+    if(it != m_children.end())
     {
         newChild->setParent(this);
         *it = newChild;
@@ -113,8 +102,8 @@ void Node::substituteChild(Node* oldChild, Node* newChild)
 
 void Node::error(std::string const& message) const
 {
-    if(_m_parser)
+    if(m_parser)
     {
-        _m_parser->error(message, _m_token);
+        m_parser->error(message, m_token);
     }
 }
